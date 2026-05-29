@@ -12,6 +12,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^6.3.8"
+    "@astrojs/tailwind": "^6.0.2",
+    "@notionhq/client": "^5.22.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "astro": "^6.3.8",
+    "tailwindcss": "^3.4.19"
   }
 }
