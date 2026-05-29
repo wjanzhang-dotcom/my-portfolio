@@ -11,19 +11,29 @@ import Feed from '../components/Feed.astro';
     <meta name="viewport" content="width=device-width" />
     <title>张伟健 - 个人主页</title>
   </head>
-  <body class="bg-white m-0 p-0 antialiased">
-    <main>
+  <body class="bg-white m-0 p-0 antialiased selection:bg-blue-500/30 overflow-x-hidden">
+    
+    <main class="w-full flex flex-col gap-2 bg-white">
       
       <Hero />
-      <div class="h-4 bg-white w-full"></div> <Portfolio />
-      <div class="h-4 bg-white w-full"></div>
       <Projects />
-
-      <section class="max-w-3xl mx-auto px-4 sm:px-6 py-32">
-        <h2 class="text-xl font-medium mb-12 text-gray-400 text-center">随笔碎片</h2>
-        <Feed />
+      <Portfolio />
+      
+      <section class="relative w-full py-24 md:py-32 px-6 md:px-[4vw] bg-[#f5f5f7] text-black">
+        <div class="max-w-7xl mx-auto relative z-10">
+          
+          <div class="flex items-center justify-between mb-12 md:mb-16">
+            <h2 class="text-3xl md:text-[3vw] font-bold tracking-tight drop-shadow-sm text-gray-900">
+              随笔碎片
+            </h2>
+            <div class="h-[1px] flex-1 bg-gray-300 ml-8 md:ml-12"></div>
+          </div>
+          
+          <Feed />
+          
+        </div>
       </section>
-
+      
     </main>
   </body>
 </html>

@@ -47,17 +47,39 @@ try {
 }
 ---
 
-<div class="space-y-8">
+<div class="w-full flex justify-center">
   {feeds.length > 0 ? (
-    feeds.map((item) => (
-      <div class="flex flex-col sm:flex-row gap-2 sm:gap-8 items-start border-b border-gray-100 pb-8 last:border-0">
-        <time class="text-sm text-gray-400 sm:w-28 shrink-0 sm:pt-1 font-mono tracking-tight">{item.date}</time>
-        <p class="text-base text-gray-800 leading-relaxed font-medium">{item.content}</p>
-      </div>
-    ))
+    <div class="w-full max-w-4xl flex flex-col gap-6 md:gap-8">
+      {feeds.map((item) => (
+        /* 外层容器：接管整体物理交互 (点击下压) */
+        <a href="#" class="group relative w-full cursor-pointer block transform active:scale-[0.98] transition-transform duration-300">
+          
+          <div class="relative flex flex-col p-6 md:p-8 bg-white border border-gray-100 rounded-3xl h-full transition-all duration-300 overflow-hidden">
+            
+                        <div class="relative z-10 flex flex-col flex-1">
+              
+              <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-tight">
+                {item.title || "无标题 (请在底层 API 逻辑中增加 title 字段拉取)"}
+              </h3>
+              
+              <div class="flex items-center gap-2 mb-4">
+                <time class="text-xs font-semibold text-gray-400 tracking-wider uppercase">{item.date}</time>
+              </div>
+              
+              <p class="text-sm md:text-base text-gray-500 leading-relaxed font-medium line-clamp-2">
+                {item.summary || item.content}
+              </p>
+
+            </div>
+
+          </div>
+        </a>
+      ))}
+    </div>
   ) : (
-    <div class="text-gray-400 text-sm font-mono flex items-center gap-2">
-      <span class="animate-pulse">📡</span> 正在建立底层通信管道...
+    <div class="w-full max-w-4xl p-8 md:p-12 rounded-3xl bg-white border border-gray-100 text-center flex flex-col items-center justify-center gap-3 shadow-sm">
+      <span class="text-2xl animate-bounce">📡</span>
+      <span class="text-sm font-mono tracking-widest text-gray-400">正在建立底层通信管道...</span>
     </div>
   )}
 </div>
