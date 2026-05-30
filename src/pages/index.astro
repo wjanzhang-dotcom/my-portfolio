@@ -3,6 +3,8 @@ import Hero from '../components/Hero.astro';
 import Portfolio from '../components/Portfolio.astro';
 import Projects from '../components/Projects.astro';
 import Feed from '../components/Feed.astro';
+// 核心引入：使用最新版 Astro 的引擎名称 ClientRouter
+import { ClientRouter } from 'astro:transitions';
 ---
 
 <html lang="zh-CN">
@@ -10,30 +12,29 @@ import Feed from '../components/Feed.astro';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>张伟健 - 个人主页</title>
+    <ClientRouter />
   </head>
-  <body class="bg-white m-0 p-0 antialiased selection:bg-blue-500/30 overflow-x-hidden">
+  <body class="bg-white m-0 p-0 antialiased selection:bg-blue-500/30 overflow-x-clip">
     
     <main class="w-full flex flex-col gap-2 bg-white">
-      
       <Hero />
       <Projects />
       <Portfolio />
-      
+
       <section class="relative w-full py-24 md:py-32 px-6 md:px-[4vw] bg-[#f5f5f7] text-black">
         <div class="max-w-7xl mx-auto relative z-10">
           
-          <div class="flex items-center justify-between mb-12 md:mb-16">
-            <h2 class="text-3xl md:text-[3vw] font-bold tracking-tight drop-shadow-sm text-gray-900">
+          <div class="sticky top-0 z-20 flex items-center justify-center py-6 mb-8 md:mb-12 bg-[#f5f5f7]/60 backdrop-blur-xl backdrop-saturate-150 border-b border-white/60">
+            <h2 class="text-3xl md:text-[3vw] font-bold tracking-tight text-gray-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
               随笔碎片
             </h2>
-            <div class="h-[1px] flex-1 bg-gray-300 ml-8 md:ml-12"></div>
           </div>
-          
+
           <Feed />
           
         </div>
       </section>
-      
+
     </main>
   </body>
 </html>
