@@ -79,8 +79,8 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     
     <div id="banner-bg" class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-screen bg-transparent border-b border-transparent transition-all duration-300 ease-out z-0"></div>
     
-    {/* 🔥 核心修正：字号由 text-3xl 提权到 text-4xl/text-5xl，强制采用超清大图渲染。加入 backface-visibility 解决渲染抖动 */}
-    <h2 id="section-title" class="relative z-10 text-4xl md:text-5xl font-bold tracking-tight text-gray-900 drop-shadow-sm origin-center" style="backface-visibility: hidden;">
+    {/* 🔥 核心修正：字号对标主骨架，提升至 text-5xl md:text-6xl（约 48px 到 60px） */}
+    <h2 id="section-title" class="relative z-10 text-5xl md:text-6xl font-bold tracking-tight text-gray-900 drop-shadow-sm origin-center" style="backface-visibility: hidden;">
       随笔碎片
     </h2>
   </div>
@@ -97,7 +97,7 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     ">
       <div id="tags-flex" class="flex flex-row items-center justify-start lg:justify-center gap-2 lg:gap-3 w-max lg:w-auto mx-auto transition-all duration-300 py-1">
         <button data-base-class={btnBaseClass} data-active-class={flatColors.default.active} data-inactive-class={flatColors.default.inactive} class={`${btnBaseClass} ${flatColors.default.active}`} data-filter="all">
-          <span>全部</span><span class="opacity-70 text-[10px] font-mono">{totalPosts}</span>
+          <span>全部碎片</span><span class="opacity-70 text-[10px] font-mono">{totalPosts}</span>
         </button>
         {sortedCategories.map(([catName, info]) => {
           const theme = flatColors[info.color] || flatColors.default;
@@ -197,16 +197,16 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     if (bannerContainer && sectionTitle) {
       sectionTitle.style.willChange = 'transform';
 
-      // 🔥 核心逻辑逆向化：从超清大图（1.0）缩小到正常字号（0.625）
+      // 🔥 核心逻辑：保证初始字号够大，且置顶时缩小到正好约 30px (缩放比例调至 0.5)
       const updateTitleScale = () => {
         const rect = bannerContainer.getBoundingClientRect();
         const range = 250; 
         const distance = Math.max(0, Math.min(rect.top, range));
         const ratio = distance / range;
         
-        // 当 ratio=1 (初始)，scale=1.0，显示原版超清 48px
-        // 当 ratio=0 (置顶)，scale=0.625，精准缩小回约 30px (即原来的 text-3xl)
-        const scale = 0.625 + (0.375 * ratio);
+        // 当 ratio=1 (初始)，scale=1.0，显示 text-6xl 原大小
+        // 当 ratio=0 (置顶)，scale=0.5，缩小一半，精确压回现有字号
+        const scale = 0.5 + (0.5 * ratio);
 
         sectionTitle.style.transform = `scale(${scale})`;
       };
