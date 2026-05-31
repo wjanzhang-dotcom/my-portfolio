@@ -1,25 +1,41 @@
 ---
+// 个人信息集区域代码 (响应式彻底修复 & 防止文本折行版)
 ---
-<section class="relative w-full py-32 md:py-0 md:aspect-[21/9] bg-zinc-950 flex flex-col justify-center items-center overflow-hidden">
+<section class="relative w-full bg-zinc-950 flex flex-col justify-center items-center overflow-hidden min-h-[42.85vw] py-24 md:py-[4vw]">
   
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.15)_0,transparent_60%)] z-0"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.12)_0,transparent_65%)] pointer-events-none"></div>
 
-  <div class="relative z-10 w-full flex flex-col items-center text-center px-6 md:px-[4vw]">
+  <div class="relative z-10 w-full max-w-5xl px-6 flex flex-col items-center text-center">
     
-    <h1 class="text-5xl md:text-[6vw] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 tracking-tight leading-none drop-shadow-sm mb-4 md:mb-[1.5vw]">
-      张伟健
+    <span class="text-zinc-400 text-xs md:text-sm tracking-[0.2em] font-medium uppercase mb-6 md:mb-8">
+      Resume & Portfolio
+    </span>
+
+    <h1 class="whitespace-nowrap text-[10vw] md:text-[5vw] font-bold text-white tracking-tight mb-6 md:mb-10 leading-none drop-shadow-md">
+      你好，我是张伟健。
     </h1>
-    
-    <p class="text-lg md:text-[1.5vw] font-light text-gray-400 tracking-wider mb-12 md:mb-[3vw]">
-      深耕科技与数字化领域
-    </p>
-    
-    <div class="relative group cursor-pointer mt-4">
-      <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
-      <span class="relative block px-8 py-3 md:px-[2vw] md:py-[1vw] bg-black border border-white/10 rounded-full text-sm md:text-[0.9vw] text-white/70 tracking-widest uppercase hover:text-white transition-colors">
-        [ 探索个人核心视觉 ]
-      </span>
+
+    <div class="text-zinc-400 text-sm md:text-base mb-12 md:mb-16 max-w-3xl mx-auto leading-loose font-normal">
+      <p>一名深耕 3C 硬件与科技内容的从业者，干过公关传播，干过媒体主笔，也干过运营工作</p>
+      <p>现在习惯用 AI 重塑工作流，赋能自己</p>
+      <p>我希望通过这个网站向世界完整地展示我自己</p>
+      <p>在这里，你可以看到我的工作履历，我跑过的 10 公里，以及一起一起这里那里的足迹</p>
     </div>
-    
+
+    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 text-sm font-semibold w-full">
+      
+      <a href="#sports" class="text-zinc-500 hover:text-zinc-200 transition-colors duration-300 py-2 px-4">
+        10KM 跑步记录
+      </a>
+
+      <a href="#work" class="group relative px-10 py-3.5 bg-white text-zinc-950 rounded-full hover:bg-zinc-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+        工作履历
+      </a>
+
+      <a href="#footprints" class="text-zinc-500 hover:text-zinc-200 transition-colors duration-300 py-2 px-4">
+        个人足迹
+      </a>
+
+    </div>
   </div>
 </section>

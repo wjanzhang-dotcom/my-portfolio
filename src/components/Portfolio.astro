@@ -1,38 +1,31 @@
 ---
+// 摄影集区块代码
 ---
-<section class="relative w-full md:aspect-[21/9] bg-transparent overflow-hidden group cursor-pointer md:cursor-auto">
-  
-  <div class="relative w-full md:absolute md:inset-0 z-0">
-    <img 
-      src="/hero-bg.jpg" 
-      alt="摄影作品入口" 
-      class="w-full h-auto md:h-full md:object-cover object-center block transition-transform duration-1000 group-hover:scale-105" 
-    />
-    
-    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent md:from-black/80 md:via-black/30"></div>
-  </div>
+<section class="relative w-full bg-zinc-950 overflow-hidden group">
 
-  <div class="absolute bottom-0 left-0 w-full p-6 flex justify-between items-end z-20 md:hidden">
-    <h2 class="text-3xl font-bold text-white tracking-widest drop-shadow-lg">摄影集</h2>
-    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-lg">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-      </svg>
-    </div>
-  </div>
+  <a href="/gallery" class="block relative w-full h-full cursor-pointer" aria-label="查看摄影集画廊">
 
-  <div class="hidden md:flex flex-col justify-end absolute inset-0 z-20 w-full text-white p-[4vw]">
-    <h2 class="text-[5vw] font-bold tracking-tight mb-[1vw] drop-shadow-md leading-none">
-      摄影集
-    </h2>
-    <p class="text-[1.5vw] text-white/90 mb-[3vw] font-medium leading-relaxed drop-shadow-lg max-w-2xl">
-      探索影像与生活方式的视觉切片。
-    </p>
-    <div>
-      <button class="px-[2vw] py-[1vw] bg-white text-black rounded-full text-[1vw] font-bold shadow-xl hover:bg-gray-200 transition-all hover:scale-105 inline-block">
-        进入画廊 ↗
-      </button>
+    <div class="relative w-full bg-black">
+      <img
+        src="/hero-bg.jpg"
+        alt="摄影作品展示"
+        class="w-full h-auto object-center block transition-transform duration-1000 transform-gpu group-hover:scale-105 opacity-95"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent md:bg-none md:bg-gradient-to-b md:from-black/60 md:via-transparent md:to-black/30"></div>
     </div>
-  </div>
-  
+
+    <div class="absolute bottom-0 left-0 w-full p-6 flex items-end z-20 md:hidden pointer-events-none">
+      <h2 class="text-3xl font-bold text-white tracking-widest drop-shadow-lg">摄影集</h2>
+    </div>
+
+    <div class="hidden md:flex flex-col justify-start items-center text-center absolute inset-0 z-20 w-full text-white pt-[4vw] px-[4vw]" aria-hidden="true">
+      <h2 class="text-[5vw] font-bold tracking-tight mb-[1vw] drop-shadow-md leading-none">
+        摄影集
+      </h2>
+      <p class="text-[1.5vw] text-white/90 font-medium leading-relaxed drop-shadow-lg max-w-2xl">
+        在这里，你可以看到山野湖海与生活方式的视觉切片。
+      </p>
+    </div>
+
+  </a>
 </section>

@@ -1,31 +1,32 @@
 ---
+// Projects.astro (视觉字号对齐版)
 ---
 <section class="relative w-full pt-20 pb-0 md:pt-0 md:pb-0 md:aspect-[21/9] bg-[#0a0a0c] overflow-hidden group">
   
   <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/10 via-black to-indigo-900/10 z-0"></div>
 
   <div class="relative z-10 w-full h-full flex flex-col justify-between items-center md:pt-[5vw] px-6 md:px-[4vw]">
-
+    
     <div class="text-center w-full max-w-4xl z-20">
-      <h2 class="text-3xl md:text-[4vw] font-bold text-white tracking-tight leading-none mb-3 md:mb-[1vw]">
+      <h2 class="text-[10vw] md:text-[5vw] font-bold text-white tracking-tight leading-none mb-4 md:mb-[1vw]">
         实验项目
       </h2>
       
       <p class="text-base md:text-[1.2vw] font-light text-gray-400 mb-8 md:mb-[2.5vw]">
-        AI 数据库架构与轻量化运算接口演示。
+        在这里，你可以看到一些我个人主导的实验项目
       </p>
 
       <div class="flex flex-row justify-center gap-4 md:gap-[1.5vw] mb-12 md:mb-0">
-        <button class="px-6 py-3 md:px-[1.5vw] md:py-[0.8vw] bg-white text-black rounded-full text-sm md:text-[0.9vw] font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-105 transition-transform">
+        <button class="px-6 py-3 md:px-[1.5vw] md:py-[0.8vw] bg-white text-black rounded-full text-sm md:text-[0.9vw] font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-zinc-200 transition-colors">
           运行沙盒
         </button>
-        <button class="px-6 py-3 md:px-[1.5vw] md:py-[0.8vw] bg-white/5 backdrop-blur-md border border-white/10 text-white rounded-full text-sm md:text-[0.9vw] font-bold hover:bg-white/10 transition-colors">
+        <button class="px-6 py-3 md:px-[1.5vw] md:py-[0.8vw] bg-white/5 backdrop-blur-md border border-white/10 text-white rounded-full text-sm md:text-[0.9vw] font-medium hover:bg-white/10 transition-colors">
           小红书主页 ↗
         </button>
       </div>
     </div>
 
-    <div class="w-[90vw] md:w-[45vw] aspect-[16/10] bg-black/40 backdrop-blur-2xl border border-white/10 rounded-t-2xl md:rounded-t-[1.5vw] flex justify-center items-center shadow-2xl relative translate-y-8 md:translate-y-[3vw] group-hover:translate-y-4 md:group-hover:translate-y-[1vw] transition-transform duration-700 ease-out z-10">
+    <div class="w-[90vw] md:w-[45vw] aspect-[16/10] bg-black/40 backdrop-blur-2xl border border-white/10 rounded-t-2xl md:rounded-t-[1.5vw] flex justify-center items-center relative">
       
       <div class="absolute top-4 left-4 md:top-[1vw] md:left-[1vw] flex gap-2 md:gap-[0.4vw]">
         <div class="w-3 h-3 md:w-[0.6vw] md:h-[0.6vw] rounded-full bg-red-500/80"></div>
@@ -36,7 +37,7 @@
       <span class="text-blue-400/60 text-sm md:text-[0.9vw] tracking-widest font-mono">
         > root@deepseeri:~# ./run_demo.sh <span class="animate-pulse">_</span>
       </span>
-      
+
     </div>
   </div>
 </section>
