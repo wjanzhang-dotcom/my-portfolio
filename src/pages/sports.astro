@@ -1,0 +1,259 @@
+---
+// src/pages/sports.astro
+import sportsData from '../data/sports.json';
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>张伟健 - 运动数据看板</title>
+</head>
+<body class="bg-white text-zinc-900 font-sans antialiased min-h-screen selection:bg-zinc-200">
+  
+  <a href="/#sports" class="fixed top-6 left-6 md:top-10 md:left-10 inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200 shadow-sm z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    返回主页
+  </a>
+
+  <main class="max-w-3xl mx-auto px-6 pt-32 pb-32">
+    
+    <header class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-zinc-900">运动数据看板</h1>
+      <p class="text-zinc-500 leading-relaxed text-sm md:text-base">
+        数字游民的肉体锚点。这里记录了通过 iOS 快捷指令自动同步的每一滴汗水。<br class="hidden md:block"/>
+        过滤了地理围栏，只保留最纯粹的心率与运动参数。
+      </p>
+    </header>
+
+    <div class="flex flex-wrap items-center gap-3 mb-6" id="filter-bar">
+      <button id="btn-all" class="px-5 py-2 rounded-full bg-zinc-900 text-white text-sm font-medium shadow-sm transition-all">全部记录</button>
+      
+      <div class="relative">
+        <select id="sel-year" class="appearance-none pl-4 pr-10 py-2 rounded-full border border-zinc-200 bg-zinc-50 text-zinc-700 text-sm font-medium hover:bg-zinc-100 transition-colors outline-none cursor-pointer focus:border-zinc-400">
+          <option value="">按年份筛选</option>
+          </select>
+        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+
+      <div class="relative">
+        <select id="sel-month" class="appearance-none pl-4 pr-10 py-2 rounded-full border border-zinc-200 bg-zinc-50 text-zinc-700 text-sm font-medium hover:bg-zinc-100 transition-colors outline-none cursor-pointer focus:border-zinc-400">
+          <option value="">按月份筛选</option>
+          </select>
+        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+
+      <div class="relative">
+        <select id="sel-week" class="appearance-none pl-4 pr-10 py-2 rounded-full border border-zinc-200 bg-zinc-50 text-zinc-700 text-sm font-medium hover:bg-zinc-100 transition-colors outline-none cursor-pointer focus:border-zinc-400">
+          <option value="">按自然周筛选</option>
+          </select>
+        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 p-6 rounded-2xl bg-zinc-50 border border-zinc-200 shadow-sm">
+      <div class="flex flex-col">
+        <span class="text-xs text-zinc-500 uppercase tracking-wider mb-1">累计距离</span>
+        <div class="flex items-baseline gap-1">
+          <span class="text-3xl font-bold text-zinc-900" id="sum-distance">0.00</span>
+          <span class="text-sm text-zinc-500 font-medium">km</span>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-xs text-zinc-500 uppercase tracking-wider mb-1">运动频次</span>
+        <div class="flex items-baseline gap-1">
+          <span class="text-3xl font-bold text-zinc-900" id="sum-count">0</span>
+          <span class="text-sm text-zinc-500 font-medium">次</span>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-xs text-zinc-500 uppercase tracking-wider mb-1">消耗热量</span>
+        <div class="flex items-baseline gap-1">
+          <span class="text-3xl font-bold text-zinc-900" id="sum-calories">0</span>
+          <span class="text-sm text-zinc-500 font-medium">kcal</span>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-xs text-zinc-500 uppercase tracking-wider mb-1">平均配速</span>
+        <span class="text-3xl font-bold text-zinc-900 mt-0.5" id="sum-pace">0'00"</span>
+      </div>
+    </div>
+
+    <div class="relative border-l border-zinc-200 pl-6 md:pl-10 space-y-12" id="timeline-container">
+      
+      {sportsData.activities.map((activity) => (
+        <div class="activity-card relative" 
+             data-date={activity.date} 
+             data-distance={activity.distance} 
+             data-duration={activity.duration} 
+             data-calories={activity.calories}>
+          
+          <div class="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-white border-2 border-zinc-300 flex items-center justify-center card-dot">
+            <div class="w-1.5 h-1.5 bg-zinc-400 rounded-full"></div>
+          </div>
+
+          <div class="flex items-baseline gap-3 mb-4">
+            <h3 class="text-xl font-bold text-zinc-900 tracking-tight">{activity.date}</h3>
+            <span class="text-sm text-zinc-500 font-mono">{activity.time} · {activity.type}</span>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-md transition-all duration-300">
+            <div class="flex flex-col">
+              <span class="text-xs text-zinc-400 uppercase tracking-wider mb-1">距离</span>
+              <div class="flex items-baseline gap-1">
+                <span class="text-2xl font-bold text-zinc-800">{activity.distance}</span>
+                <span class="text-sm text-zinc-500">{activity.unit}</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-zinc-400 uppercase tracking-wider mb-1">时长</span>
+              <span class="text-xl font-semibold text-zinc-700 mt-0.5">{activity.duration}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-zinc-400 uppercase tracking-wider mb-1">平均配速</span>
+              <span class="text-xl font-semibold text-zinc-700 mt-0.5">{activity.pace}</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-zinc-400 uppercase tracking-wider mb-1">心率 / 消耗</span>
+              <span class="text-sm font-medium text-zinc-600 mt-1">{activity.avgHeartRate} bpm</span>
+              <span class="text-sm text-zinc-500">{activity.calories} kcal</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = Array.from(document.querySelectorAll('.activity-card'));
+      
+      // DOM 节点引用
+      const btnAll = document.getElementById('btn-all');
+      const selYear = document.getElementById('sel-year');
+      const selMonth = document.getElementById('sel-month');
+      const selWeek = document.getElementById('sel-week');
+      
+      const elDist = document.getElementById('sum-distance');
+      const elCount = document.getElementById('sum-count');
+      const elCal = document.getElementById('sum-calories');
+      const elPace = document.getElementById('sum-pace');
+
+      // 辅助函数：将日期转换为 "YYYY年 第X周" 格式
+      const getWeekString = (dateStr) => {
+        const date = new Date(dateStr);
+        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+        const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        return `${date.getFullYear()}年 第${weekNum}周`;
+      };
+
+      // 1. 从数据中提取并初始化筛选器选项
+      const years = new Set();
+      const months = new Set();
+      const weeks = new Set();
+
+      cards.forEach(card => {
+        const dStr = card.getAttribute('data-date'); // e.g. "2026-05-30"
+        years.add(dStr.substring(0, 4));
+        months.add(dStr.substring(0, 7)); // "2026-05"
+        weeks.add(getWeekString(dStr));
+        // 将周数据写回到卡片 DOM，方便筛选
+        card.setAttribute('data-week', getWeekString(dStr));
+      });
+
+      // 排序并注入下拉框
+      [...years].sort().reverse().forEach(y => selYear.add(new Option(`${y}年`, y)));
+      [...months].sort().reverse().forEach(m => selMonth.add(new Option(m.replace('-', '年')+'月', m)));
+      [...weeks].sort().reverse().forEach(w => selWeek.add(new Option(w, w)));
+
+      // 2. 核心计算引擎：根据当前可见的卡片计算汇总数据
+      const calculateSummary = () => {
+        let totalDist = 0;
+        let totalCal = 0;
+        let totalSeconds = 0;
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          if (card.style.display !== 'none') {
+            visibleCount++;
+            totalDist += parseFloat(card.getAttribute('data-distance') || 0);
+            totalCal += parseInt(card.getAttribute('data-calories') || 0);
+            
+            // 解析时长 "26:45" 为秒数
+            const durationArr = (card.getAttribute('data-duration') || "0:0").split(':');
+            totalSeconds += parseInt(durationArr[0]) * 60 + parseInt(durationArr[1]);
+          }
+        });
+
+        // 渲染基础数据
+        elCount.textContent = visibleCount;
+        elDist.textContent = totalDist.toFixed(2);
+        elCal.textContent = totalCal;
+
+        // 计算真实平均配速 (总时长 / 总距离)
+        if (totalDist > 0) {
+          const avgPaceSeconds = Math.floor(totalSeconds / totalDist);
+          const paceMins = Math.floor(avgPaceSeconds / 60);
+          const paceSecs = (avgPaceSeconds % 60).toString().padStart(2, '0');
+          elPace.textContent = `${paceMins}'${paceSecs}"`;
+        } else {
+          elPace.textContent = `0'00"`;
+        }
+      };
+
+      // 3. 筛选逻辑交互
+      const resetButtons = () => {
+        btnAll.className = "px-5 py-2 rounded-full bg-zinc-50 border border-zinc-200 text-zinc-700 text-sm font-medium hover:bg-zinc-100 transition-all";
+      };
+
+      const filterCards = (type, value) => {
+        resetButtons();
+        
+        cards.forEach(card => {
+          const dStr = card.getAttribute('data-date');
+          const wStr = card.getAttribute('data-week');
+          let match = false;
+
+          if (type === 'year' && dStr.startsWith(value)) match = true;
+          if (type === 'month' && dStr.startsWith(value)) match = true;
+          if (type === 'week' && wStr === value) match = true;
+
+          card.style.display = match ? 'block' : 'none';
+        });
+
+        calculateSummary();
+      };
+
+      // 事件监听
+      btnAll.addEventListener('click', () => {
+        btnAll.className = "px-5 py-2 rounded-full bg-zinc-900 text-white text-sm font-medium shadow-sm transition-all";
+        selYear.value = ""; selMonth.value = ""; selWeek.value = "";
+        cards.forEach(card => card.style.display = 'block');
+        calculateSummary();
+      });
+
+      selYear.addEventListener('change', (e) => {
+        if(!e.target.value) return;
+        selMonth.value = ""; selWeek.value = "";
+        filterCards('year', e.target.value);
+      });
+
+      selMonth.addEventListener('change', (e) => {
+        if(!e.target.value) return;
+        selYear.value = ""; selWeek.value = "";
+        filterCards('month', e.target.value);
+      });
+
+      selWeek.addEventListener('change', (e) => {
+        if(!e.target.value) return;
+        selYear.value = ""; selMonth.value = "";
+        filterCards('week', e.target.value);
+      });
+
+      // 初始化计算一次
+      calculateSummary();
+    });
+  </script>
+</body>
+</html>

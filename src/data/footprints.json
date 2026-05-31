@@ -1,0 +1,51 @@
+{
+  "currentLocation": {
+    "city": "广州市",
+    "district": "增城区",
+    "coordinates": [113.829, 23.290] 
+  },
+  "visitedDistricts": [
+    { "name": "增城区", "city": "广州市" },
+    { "name": "西湖区", "city": "杭州市" },
+    { "name": "武侯区", "city": "成都市" },
+    { "name": "南山区", "city": "深圳市" },
+    { "name": "吉州区", "city": "吉安市" }
+  ],
+  "timeline": [
+    {
+      "date": "2026-05-31",
+      "city": "广州市",
+      "district": "增城区",
+      "type": "current",
+      "note": "当前驻留地。通过快捷指令自动更新。"
+    },
+    {
+      "date": "2024-10-15",
+      "city": "杭州市",
+      "district": "西湖区",
+      "type": "past",
+      "note": "西湖风景名胜区周边探索。"
+    },
+    {
+      "date": "2024-08-20",
+      "city": "吉安市",
+      "district": "吉州区",
+      "type": "past",
+      "note": "山地风电大风车与自然景观摄影。"
+    },
+    {
+      "date": "2024-08-19",
+      "city": "广州市",
+      "district": "天河区",
+      "type": "past",
+      "note": "遭遇罕见暴雨与城市内涝。"
+    },
+    {
+      "date": "2024-07-10",
+      "city": "成都市",
+      "district": "武侯区",
+      "type": "past",
+      "note": "城市漫游与街头记录。"
+    }
+  ]
+}

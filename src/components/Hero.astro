@@ -1,5 +1,5 @@
 ---
-// 个人信息集区域代码 (响应式彻底修复 & 防止文本折行版)
+// Hero.astro 
 ---
 <section class="relative w-full bg-zinc-950 flex flex-col justify-center items-center overflow-hidden min-h-[42.85vw] py-24 md:py-[4vw]">
   
@@ -11,31 +11,121 @@
       Resume & Portfolio
     </span>
 
-    <h1 class="whitespace-nowrap text-[10vw] md:text-[5vw] font-bold text-white tracking-tight mb-6 md:mb-10 leading-none drop-shadow-md">
-      你好，我是张伟健。
+    <h1 class="whitespace-nowrap text-[10vw] md:text-[5vw] font-bold text-white tracking-tight mb-14 md:mb-20 leading-none drop-shadow-md">
+      你好，我是张伟健
     </h1>
 
-    <div class="text-zinc-400 text-sm md:text-base mb-12 md:mb-16 max-w-3xl mx-auto leading-loose font-normal">
+    <div class="duang-text space-y-5 md:space-y-6 text-zinc-400 text-sm md:text-base mb-14 md:mb-20 max-w-3xl mx-auto leading-loose font-normal">
       <p>一名深耕 3C 硬件与科技内容的从业者，干过公关传播，干过媒体主笔，也干过运营工作</p>
       <p>现在习惯用 AI 重塑工作流，赋能自己</p>
-      <p>我希望通过这个网站向世界完整地展示我自己</p>
-      <p>在这里，你可以看到我的工作履历，我跑过的 10 公里，以及一起一起这里那里的足迹</p>
+      <p>在这里，你可以看到我的工作履历、我跑过的 10 公里，以及一起一起这里那里的足迹</p>
     </div>
 
-    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 text-sm font-semibold w-full">
+    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-sm font-semibold w-full">
       
-      <a href="#sports" class="text-zinc-500 hover:text-zinc-200 transition-colors duration-300 py-2 px-4">
-        10KM 跑步记录
+      <a href="sports" class="magnetic-btn px-6 py-3 bg-white/5 border border-white/10 text-zinc-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm shadow-sm">
+        <span class="magnetic-text inline-block pointer-events-none">运动记录</span>
       </a>
 
-      <a href="#work" class="group relative px-10 py-3.5 bg-white text-zinc-950 rounded-full hover:bg-zinc-200 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-        工作履历
+      <a href="resume" class="magnetic-btn group relative px-10 py-3.5 bg-white text-zinc-950 rounded-full hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] z-10">
+        <span class="magnetic-text inline-block pointer-events-none">工作履历</span>
       </a>
 
-      <a href="#footprints" class="text-zinc-500 hover:text-zinc-200 transition-colors duration-300 py-2 px-4">
-        个人足迹
+      <a href="footprints" class="magnetic-btn px-6 py-3 bg-white/5 border border-white/10 text-zinc-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm shadow-sm">
+        <span class="magnetic-text inline-block pointer-events-none">个人足迹</span>
       </a>
 
     </div>
   </div>
 </section>
+
+<style>
+  .duang-text:hover p {
+    color: #71717a; 
+    transition: color 0.4s ease;
+  }
+
+  .duang-text p {
+    display: inline-block;
+    width: 100%;
+    transition: color 0.3s ease, transform 0.3s ease;
+    cursor: default;
+    
+    will-change: opacity, transform;
+    
+    opacity: 0;
+    animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .duang-text p:hover {
+    color: #ffffff; 
+    transform: translateX(4px); 
+  }
+
+  .duang-text p:nth-child(1) { animation-delay: 0.1s; }
+  .duang-text p:nth-child(2) { animation-delay: 0.25s; }
+  .duang-text p:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes fade-in-up {
+    0% { 
+      opacity: 0; 
+      transform: translateY(10px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: translateY(0) translateX(0); 
+    }
+  }
+</style>
+
+<script>
+  const initMagneticButtons = () => {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const magneticButtons = document.querySelectorAll('.magnetic-btn');
+
+    magneticButtons.forEach((btn) => {
+      const textContent = btn.querySelector('.magnetic-text');
+      let requestAnimationFrameId = null; 
+
+      btn.addEventListener('mousemove', (e) => {
+        if (requestAnimationFrameId) {
+          cancelAnimationFrame(requestAnimationFrameId);
+        }
+
+        requestAnimationFrameId = requestAnimationFrame(() => {
+          const rect = btn.getBoundingClientRect();
+          const h = rect.width / 2;
+          const v = rect.height / 2;
+          const x = e.clientX - rect.left - h;
+          const y = e.clientY - rect.top - v;
+
+          btn.style.transition = 'none'; 
+          btn.style.transform = `translate(${x * 0.35}px, ${y * 0.35}px) scale(1.04)`;
+
+          if (textContent) {
+            textContent.style.transition = 'none';
+            textContent.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+          }
+        });
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        if (requestAnimationFrameId) {
+          cancelAnimationFrame(requestAnimationFrameId);
+        }
+        
+        btn.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        btn.style.transform = 'translate(0px, 0px) scale(1)';
+
+        if (textContent) {
+          textContent.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          textContent.style.transform = 'translate(0px, 0px)';
+        }
+      });
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', initMagneticButtons);
+  document.addEventListener('astro:page-load', initMagneticButtons);
+</script>

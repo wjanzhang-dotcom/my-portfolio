@@ -1,0 +1,129 @@
+---
+// src/pages/footprints.astro
+import footprintData from '../data/footprints.json';
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>张伟健 - 个人足迹</title>
+  <script src="https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY&plugin=AMap.DistrictSearch" async></script>
+</head>
+<body class="bg-white text-zinc-900 font-sans antialiased min-h-screen selection:bg-zinc-200">
+  
+  <a href="/#footprints" class="fixed top-6 left-6 md:top-10 md:left-10 inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200 shadow-sm z-50">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    返回主页
+  </a>
+
+  <section class="relative w-full h-[50vh] md:h-[60vh] bg-zinc-100 border-b border-zinc-200" id="map-container">
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-400">
+      <svg class="w-8 h-8 mb-3 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="text-sm tracking-widest uppercase font-medium">Map Loading...</span>
+      <span class="text-xs mt-2 text-zinc-500">已接入高德地图官方数据，确保测绘合法合规</span>
+    </div>
+  </section>
+
+  <main class="max-w-3xl mx-auto px-6 pt-16 pb-32 relative -mt-8 z-10">
+    
+    <header class="mb-16 bg-white/80 backdrop-blur-xl p-8 rounded-2xl border border-zinc-200 shadow-sm">
+      <h1 class="text-4xl font-bold tracking-tight mb-4 text-zinc-900">足迹流</h1>
+      <p class="text-zinc-500 leading-relaxed text-sm md:text-base mb-8">
+        通过 iOS 快捷指令自动定位，剥离绝对坐标，仅保留区县级颗粒度。<br class="hidden md:block"/>
+        一切行程，皆为经历。
+      </p>
+
+      <div class="flex items-center gap-6">
+        <div class="flex flex-col">
+          <span class="text-xs text-zinc-500 uppercase tracking-wider mb-1">当前位置</span>
+          <span class="text-lg font-bold text-zinc-900">📍 {footprintData.currentLocation.city} {footprintData.currentLocation.district}</span>
+        </div>
+        <div class="w-px h-8 bg-zinc-200"></div>
+        <div class="flex flex-col">
+          <span class="text-xs text-zinc-500 uppercase tracking-wider mb-1">探索区域</span>
+          <span class="text-lg font-bold text-emerald-600">{footprintData.visitedDistricts.length} 个区县</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="relative border-l border-zinc-200 pl-6 md:pl-10 space-y-10">
+      {footprintData.timeline.map((item) => (
+        <div class="relative">
+          <div class={`absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full border-2 flex items-center justify-center ${item.type === 'current' ? 'bg-emerald-100 border-emerald-500 animate-pulse' : 'bg-white border-zinc-300'}`}>
+            <div class={`w-1.5 h-1.5 rounded-full ${item.type === 'current' ? 'bg-emerald-600' : 'bg-zinc-400'}`}></div>
+          </div>
+
+          <div class="flex flex-col">
+            <span class="text-sm font-mono text-zinc-500 mb-1">{item.date}</span>
+            <h3 class="text-lg font-bold text-zinc-900 mb-2">{item.city} <span class="text-zinc-500 font-normal">{item.district}</span></h3>
+            <p class="text-zinc-600 text-sm leading-relaxed bg-zinc-50 p-4 rounded-lg border border-zinc-100">
+              {item.note}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </main>
+
+  <script>
+    // 这段逻辑在实际配置了高德 API Key 后生效
+    document.addEventListener('DOMContentLoaded', () => {
+      // 检查高德 API 是否加载
+      if (typeof AMap === 'undefined') return;
+
+      // 1. 初始化合规底图 (使用极简风格)
+      const map = new AMap.Map('map-container', {
+        zoom: 5,
+        center: [104.195397, 35.86166], // 中国中心点
+        mapStyle: 'amap://styles/light', // 官方极简白底风格，剔除杂乱信息
+        zoomEnable: true,
+        dragEnable: true
+      });
+
+      // 2. 渲染已访问过的绿色色块 (绝对合法的 API 方式)
+      const districtSearch = new AMap.DistrictSearch({
+        extensions: 'all',
+        subdistrict: 0
+      });
+
+      // 假设从数据层读取的区县名
+      const visited = ["增城区", "西湖区", "武侯区", "南山区", "吉州区"];
+
+      visited.forEach(district => {
+        districtSearch.search(district, (status, result) => {
+          if (status === 'complete' && result.districtList[0]) {
+            const bounds = result.districtList[0].boundaries;
+            if (bounds) {
+              for (let i = 0; i < bounds.length; i++) {
+                const polygon = new AMap.Polygon({
+                  path: bounds[i],
+                  fillColor: '#10b981', // 翡翠绿 (tailwind emerald-500)
+                  fillOpacity: 0.2,
+                  strokeColor: '#059669', // 边界线
+                  strokeWeight: 1
+                });
+                map.add(polygon);
+              }
+            }
+          }
+        });
+      });
+
+      // 3. 标记当前位置 📌
+      const marker = new AMap.Marker({
+        position: new AMap.LngLat(113.829, 23.290), // 增城区大致坐标
+        icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png',
+        offset: new AMap.Pixel(-13, -30)
+      });
+      map.add(marker);
+      
+      // 视角平滑移至当前位置
+      setTimeout(() => {
+        map.setZoomAndCenter(8, [113.829, 23.290], false, 1000);
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

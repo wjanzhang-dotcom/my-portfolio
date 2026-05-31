@@ -1,0 +1,44 @@
+{
+  "filters": ["全部", "近一周", "本月", "今年"],
+  "activities": [
+    {
+      "id": "run-001",
+      "date": "2026-05-30",
+      "time": "19:30",
+      "type": "户外跑步",
+      "distance": "5.02",
+      "unit": "km",
+      "duration": "26:45",
+      "pace": "5'19\"/km",
+      "calories": "345",
+      "avgHeartRate": "158",
+      "tag": "近一周"
+    },
+    {
+      "id": "run-002",
+      "date": "2026-05-25",
+      "time": "18:15",
+      "type": "户外跑步",
+      "distance": "5.05",
+      "unit": "km",
+      "duration": "28:10",
+      "pace": "5'34\"/km",
+      "calories": "320",
+      "avgHeartRate": "145",
+      "tag": "本月"
+    },
+    {
+      "id": "cycle-001",
+      "date": "2026-04-12",
+      "time": "08:00",
+      "type": "户外骑行",
+      "distance": "15.2",
+      "unit": "km",
+      "duration": "45:20",
+      "pace": "20.1 km/h",
+      "calories": "410",
+      "avgHeartRate": "135",
+      "tag": "今年"
+    }
+  ]
+}
