@@ -1,7 +1,7 @@
 ---
-// Hero.astro 
+// Hero.astro
 ---
-<section class="relative w-full bg-zinc-950 flex flex-col justify-center items-center overflow-hidden min-h-[42.85vw] py-24 md:py-[4vw]">
+<section class="relative w-full bg-zinc-950 flex flex-col justify-center items-center overflow-hidden min-h-[42.85vw] py-24 md:py-[4vw] group">
   
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.12)_0,transparent_65%)] pointer-events-none"></div>
 
@@ -11,7 +11,7 @@
       Resume & Portfolio
     </span>
 
-    <h1 class="whitespace-nowrap text-[10vw] md:text-[5vw] font-bold text-white tracking-tight mb-14 md:mb-20 leading-none drop-shadow-md">
+    <h1 class="whitespace-nowrap text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white tracking-tight mb-14 md:mb-20 leading-none drop-shadow-md">
       你好，我是张伟健
     </h1>
 
@@ -21,19 +21,31 @@
       <p>在这里，你可以看到我的工作履历、我跑过的 10 公里，以及一起一起这里那里的足迹</p>
     </div>
 
-    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-sm font-semibold w-full">
+    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full z-20" style="filter: url(#gooey);">
       
-      <a href="sports" class="magnetic-btn px-6 py-3 bg-white/5 border border-white/10 text-zinc-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm shadow-sm">
-        <span class="magnetic-text inline-block pointer-events-none">运动记录</span>
-      </a>
+      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
+        <div class="magnetic-btn rounded-full">
+          <a href="sports" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
+            <span class="magnetic-text inline-block pointer-events-none">运动记录</span>
+          </a>
+        </div>
+      </div>
 
-      <a href="resume" class="magnetic-btn group relative px-10 py-3.5 bg-white text-zinc-950 rounded-full hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] z-10">
-        <span class="magnetic-text inline-block pointer-events-none">工作履历</span>
-      </a>
+      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2 z-10">
+        <div class="magnetic-btn rounded-full">
+          <a href="resume" class="block relative px-8 py-3.5 md:px-10 md:py-4 bg-white text-zinc-950 rounded-full text-sm md:text-base font-bold hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
+            <span class="magnetic-text inline-block pointer-events-none">工作履历</span>
+          </a>
+        </div>
+      </div>
 
-      <a href="footprints" class="magnetic-btn px-6 py-3 bg-white/5 border border-white/10 text-zinc-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm shadow-sm">
-        <span class="magnetic-text inline-block pointer-events-none">个人足迹</span>
-      </a>
+      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
+        <div class="magnetic-btn rounded-full">
+          <a href="footprints" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
+            <span class="magnetic-text inline-block pointer-events-none">个人足迹</span>
+          </a>
+        </div>
+      </div>
 
     </div>
   </div>
