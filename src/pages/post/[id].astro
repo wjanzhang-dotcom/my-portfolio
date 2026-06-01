@@ -44,6 +44,7 @@ async function fetchAllChildren(blockId) {
     hasMore = data.has_more;
   }
 
+  // 这里的拉取可以保持并行，因为 block 数量通常可控
   const childTasks = allBlocks.map(async (b) => {
     if (b.has_children && b.type !== 'child_page' && b.type !== 'child_database') {
       b.children_blocks = await fetchAllChildren(b.id);
@@ -62,8 +63,9 @@ const imgDir = path.join(baseDir, 'notion-images');
 
 if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
 
+// 关键优化：将图片下载改为串行 (for...of)，彻底避免触发 Notion API 的速率限制
 async function processImages(blocks) {
-  const tasks = blocks.map(async (block) => {
+  for (const block of blocks) {
     if (block.type === 'image' && block.image.type === 'file') {
       const originalUrl = block.image.file.url;
       try {
@@ -84,10 +86,9 @@ async function processImages(blocks) {
       }
     }
     if (block.children_blocks) {
-      await processImages(block.children_blocks);
+      await processImages(block.children_blocks); // 递归等待，保证串行执行
     }
-  });
-  await Promise.all(tasks);
+  }
 }
 await processImages(rawBlocks);
 
@@ -213,17 +214,17 @@ const mobilePages = groupedBlocks.map((g, idx) => ({
       <>
         <div id="mobile-overlay" class="fixed inset-0 bg-black/10 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"></div>
         
-        <div id="mobile-menu-container" class="fixed bottom-0 left-0 w-full bg-white/5 backdrop-blur-xl backdrop-saturate-[250%] border-t border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_-12px_40px_rgba(0,0,0,0.05)] rounded-t-[2rem] p-6 pb-12 z-50 transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] lg:hidden">
+        <div id="mobile-menu-container" class="fixed bottom-0 left-0 w-full bg-white/70 backdrop-blur-2xl backdrop-saturate-[180%] border-t border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,1),0_-12px_40px_rgba(0,0,0,0.05)] rounded-t-[2rem] p-6 pb-12 z-50 transform translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] lg:hidden">
             <div class="w-12 h-1.5 bg-gray-400/40 rounded-full mx-auto mb-6"></div>
             <div class="flex justify-between items-center mb-4">
                <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">文章结构</span>
-               <button id="mobile-menu-close" class="text-gray-500 p-1 hover:bg-black/5 rounded-full transition-colors">
+               <button id="mobile-menu-close" class="text-gray-500 p-1 active:bg-black/5 rounded-full transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>
                </button>
             </div>
             <nav id="mobile-menu-list" class="flex flex-col gap-1 max-h-[50vh] overflow-y-auto overscroll-contain pb-safe">
               {mobilePages.map(page => (
-                 <button class="mobile-toc-link text-left px-4 py-3 text-base font-medium text-gray-800 hover:bg-white/20 hover:text-black hover:shadow-sm rounded-xl transition-all line-clamp-2" data-index={page.index}>
+                 <button class="mobile-toc-link text-left px-4 py-3 text-base font-medium text-gray-800 active:bg-gray-200/50 active:text-black rounded-xl transition-all line-clamp-2" data-index={page.index}>
                    {page.text}
                  </button>
               ))}
@@ -232,15 +233,15 @@ const mobilePages = groupedBlocks.map((g, idx) => ({
 
         <div id="mobile-bottom-nav" data-pos="first" class="group fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100vw-32px)] max-w-[360px] h-12 lg:hidden">
            
-           <button id="nav-prev" class="absolute left-0 top-0 w-12 h-12 z-10 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-xl backdrop-saturate-[250%] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),_0_4px_16px_rgba(0,0,0,0.03)] text-gray-800 transition-all duration-500 scale-100 opacity-100 pointer-events-auto group-data-[pos=first]:opacity-0 group-data-[pos=first]:scale-75 group-data-[pos=first]:pointer-events-none">
+           <button id="nav-prev" class="absolute left-0 top-0 w-12 h-12 z-10 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-2xl backdrop-saturate-[180%] border border-black/5 shadow-[inset_0_1px_0_rgba(255,255,255,1),_0_6px_20px_rgba(0,0,0,0.08)] text-gray-800 transition-all duration-500 scale-100 opacity-100 pointer-events-auto group-data-[pos=first]:opacity-0 group-data-[pos=first]:scale-75 group-data-[pos=first]:pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
            </button>
 
-           <button id="nav-menu-trigger" class="absolute top-0 h-12 z-0 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-xl backdrop-saturate-[250%] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),_0_6px_24px_rgba(0,0,0,0.04)] text-gray-800 active:scale-95 transition-all duration-500 left-[60px] right-[60px] px-4 group-data-[pos=first]:left-0 group-data-[pos=last]:right-0">
+           <button id="nav-menu-trigger" class="absolute top-0 h-12 z-0 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-2xl backdrop-saturate-[180%] border border-black/5 shadow-[inset_0_1px_0_rgba(255,255,255,1),_0_6px_20px_rgba(0,0,0,0.08)] text-gray-800 active:scale-95 transition-all duration-500 left-[60px] right-[60px] px-4 group-data-[pos=first]:left-0 group-data-[pos=last]:right-0">
                <span id="nav-menu-text" class="text-sm font-semibold truncate text-center w-full block"></span>
            </button>
 
-           <button id="nav-next" class="absolute right-0 top-0 w-12 h-12 z-10 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-xl backdrop-saturate-[250%] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),_0_4px_16px_rgba(0,0,0,0.03)] text-gray-700 transition-all duration-500 scale-100 opacity-100 pointer-events-auto group-data-[pos=last]:opacity-0 group-data-[pos=last]:scale-75 group-data-[pos=last]:pointer-events-none">
+           <button id="nav-next" class="absolute right-0 top-0 w-12 h-12 z-10 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-2xl backdrop-saturate-[180%] border border-black/5 shadow-[inset_0_1px_0_rgba(255,255,255,1),_0_6px_20px_rgba(0,0,0,0.08)] text-gray-700 transition-all duration-500 scale-100 opacity-100 pointer-events-auto group-data-[pos=last]:opacity-0 group-data-[pos=last]:scale-75 group-data-[pos=last]:pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
            </button>
 
