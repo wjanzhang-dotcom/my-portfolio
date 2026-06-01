@@ -1,6 +1,9 @@
 ---
 // src/pages/footprints.astro
 import footprintData from '../data/footprints.json';
+
+// 从环境变量读取高德 Key
+const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
 ---
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -8,7 +11,7 @@ import footprintData from '../data/footprints.json';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>张伟健 - 个人足迹</title>
-  <script src="https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY&plugin=AMap.DistrictSearch" async></script>
+  <script src={`https://webapi.amap.com/maps?v=2.0&key=${amapKey}&plugin=AMap.DistrictSearch`} async></script>
 </head>
 <body class="bg-white text-zinc-900 font-sans antialiased min-h-screen selection:bg-zinc-200">
   
@@ -64,65 +67,74 @@ import footprintData from '../data/footprints.json';
         </div>
       ))}
     </div>
-
   </main>
 
-  <script>
-    // 这段逻辑在实际配置了高德 API Key 后生效
+  <script define:vars={{ mapData: footprintData }}>
     document.addEventListener('DOMContentLoaded', () => {
-      // 检查高德 API 是否加载
-      if (typeof AMap === 'undefined') return;
+      // 轮询等待高德 API 加载完毕
+      const checkAMap = setInterval(() => {
+        if (typeof AMap !== 'undefined') {
+          clearInterval(checkAMap);
+          initMap();
+        }
+      }, 100);
 
-      // 1. 初始化合规底图 (使用极简风格)
-      const map = new AMap.Map('map-container', {
-        zoom: 5,
-        center: [104.195397, 35.86166], // 中国中心点
-        mapStyle: 'amap://styles/light', // 官方极简白底风格，剔除杂乱信息
-        zoomEnable: true,
-        dragEnable: true
-      });
+      function initMap() {
+        const map = new AMap.Map('map-container', {
+          zoom: 5,
+          center: [104.195397, 35.86166], 
+          mapStyle: 'amap://styles/light', 
+          zoomEnable: true,
+          dragEnable: true
+        });
 
-      // 2. 渲染已访问过的绿色色块 (绝对合法的 API 方式)
-      const districtSearch = new AMap.DistrictSearch({
-        extensions: 'all',
-        subdistrict: 0
-      });
+        const districtSearch = new AMap.DistrictSearch({
+          extensions: 'all',
+          subdistrict: 0
+        });
 
-      // 假设从数据层读取的区县名
-      const visited = ["增城区", "西湖区", "武侯区", "南山区", "吉州区"];
-
-      visited.forEach(district => {
-        districtSearch.search(district, (status, result) => {
-          if (status === 'complete' && result.districtList[0]) {
-            const bounds = result.districtList[0].boundaries;
-            if (bounds) {
-              for (let i = 0; i < bounds.length; i++) {
-                const polygon = new AMap.Polygon({
-                  path: bounds[i],
-                  fillColor: '#10b981', // 翡翠绿 (tailwind emerald-500)
-                  fillOpacity: 0.2,
-                  strokeColor: '#059669', // 边界线
-                  strokeWeight: 1
-                });
-                map.add(polygon);
+        // 1. 渲染多边形区域：使用 城市+区县 联合搜索
+        mapData.visitedDistricts.forEach(place => {
+          const keyword = `${place.city}${place.district}`;
+          districtSearch.search(keyword, (status, result) => {
+            if (status === 'complete' && result.districtList[0]) {
+              const bounds = result.districtList[0].boundaries;
+              if (bounds) {
+                for (let i = 0; i < bounds.length; i++) {
+                  const polygon = new AMap.Polygon({
+                    path: bounds[i],
+                    fillColor: '#10b981', // Tailwind emerald-500
+                    fillOpacity: 0.2,
+                    strokeColor: '#059669', // Tailwind emerald-600
+                    strokeWeight: 1
+                  });
+                  map.add(polygon);
+                }
               }
             }
-          }
+          });
         });
-      });
 
-      // 3. 标记当前位置 📌
-      const marker = new AMap.Marker({
-        position: new AMap.LngLat(113.829, 23.290), // 增城区大致坐标
-        icon: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png',
-        offset: new AMap.Pixel(-13, -30)
-      });
-      map.add(marker);
-      
-      // 视角平滑移至当前位置
-      setTimeout(() => {
-        map.setZoomAndCenter(8, [113.829, 23.290], false, 1000);
-      }, 1500);
+        // 2. 渲染当前位置：抛弃默认红图，使用原生的 Tailwind DOM 结构做呼吸灯
+        const customMarkerContent = `
+          <div class="relative flex items-center justify-center w-6 h-6">
+            <div class="absolute w-full h-full bg-emerald-400 rounded-full animate-ping opacity-75"></div>
+            <div class="relative w-3 h-3 bg-emerald-600 rounded-full border-2 border-white shadow-sm"></div>
+          </div>
+        `;
+
+        const marker = new AMap.Marker({
+          position: new AMap.LngLat(mapData.currentLocation.lnglat[0], mapData.currentLocation.lnglat[1]),
+          content: customMarkerContent,
+          offset: new AMap.Pixel(-12, -12)
+        });
+        map.add(marker);
+        
+        // 视角平滑移至当前位置
+        setTimeout(() => {
+          map.setZoomAndCenter(9, mapData.currentLocation.lnglat, false, 1200);
+        }, 1000);
+      }
     });
   </script>
 </body>
