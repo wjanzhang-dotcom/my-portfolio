@@ -21,27 +21,27 @@
       <p>在这里，你可以看到我的工作履历、我跑过的 10 公里，以及一起一起这里那里的足迹</p>
     </div>
 
-    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full z-20" style="filter: url(#gooey);">
+    <div class="mobile-anim-container flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full z-20" style="filter: url(#gooey);">
       
-      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
+      <div class="mobile-anim-trigger transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
         <div class="magnetic-btn rounded-full">
-          <a href="sports" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
+          <a href="sports" class="btn-inner-dark block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
             <span class="magnetic-text inline-block pointer-events-none">运动记录</span>
           </a>
         </div>
       </div>
 
-      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2 z-10">
+      <div class="mobile-anim-trigger transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2 z-10">
         <div class="magnetic-btn rounded-full">
-          <a href="resume" class="block relative px-8 py-3.5 md:px-10 md:py-4 bg-white text-zinc-950 rounded-full text-sm md:text-base font-bold hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
+          <a href="resume" class="btn-inner-light block relative px-8 py-3.5 md:px-10 md:py-4 bg-white text-zinc-950 rounded-full text-sm md:text-base font-bold hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
             <span class="magnetic-text inline-block pointer-events-none">工作履历</span>
           </a>
         </div>
       </div>
 
-      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
+      <div class="mobile-anim-trigger transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
         <div class="magnetic-btn rounded-full">
-          <a href="footprints" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
+          <a href="footprints" class="btn-inner-dark block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
             <span class="magnetic-text inline-block pointer-events-none">个人足迹</span>
           </a>
         </div>
@@ -88,9 +88,25 @@
       transform: translateY(0) translateX(0); 
     }
   }
+
+  /* ====================================================
+     新增：移动端专属的伪悬浮状态（映射 Tailwind 的 Hover 样式）
+     ==================================================== */
+  .sim-hover {
+    transform: translateY(-8px) !important;
+  }
+  .sim-hover .btn-inner-dark {
+    background-color: #3f3f46 !important; /* 对应 hover:bg-zinc-700 */
+    box-shadow: 0 10px 30px rgba(255,255,255,0.15) !important;
+  }
+  .sim-hover .btn-inner-light {
+    background-color: #e4e4e7 !important; /* 对应 hover:bg-zinc-200 */
+    box-shadow: 0 10px 30px rgba(255,255,255,0.4) !important;
+  }
 </style>
 
 <script>
+  // 1. 原本的 PC 端磁性吸附动画
   const initMagneticButtons = () => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
 
@@ -138,6 +154,48 @@
     });
   };
 
-  document.addEventListener('DOMContentLoaded', initMagneticButtons);
-  document.addEventListener('astro:page-load', initMagneticButtons);
+  // 2. 新增：移动端专属滑动侦测波浪动画
+  const initMobileAutoAnim = () => {
+    // 强制隔离：仅在非精准设备（手机/触屏）上运行
+    if (window.matchMedia("(pointer: fine)").matches) return;
+
+    const container = document.querySelector('.mobile-anim-container');
+    const triggers = document.querySelectorAll('.mobile-anim-trigger');
+    if (!container || triggers.length === 0) return;
+
+    // IntersectionObserver 引擎：监控容器是否进入视野
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        // 当按钮组进入屏幕达 80% 的时候触发
+        if (entry.isIntersecting) {
+          
+          triggers.forEach((trigger, index) => {
+            // 延时执行，制造 200ms 间隔的“波浪”视觉差
+            setTimeout(() => {
+              trigger.classList.add('sim-hover'); // 升起并亮起
+              
+              // 保持 800ms 后自动回落，完成一次“呼吸交互”
+              setTimeout(() => {
+                trigger.classList.remove('sim-hover');
+              }, 800);
+              
+            }, index * 200); 
+          });
+
+        }
+      });
+    }, { threshold: 0.8 });
+
+    observer.observe(container);
+  };
+
+  // 初始化绑定
+  document.addEventListener('DOMContentLoaded', () => {
+    initMagneticButtons();
+    initMobileAutoAnim();
+  });
+  document.addEventListener('astro:page-load', () => {
+    initMagneticButtons();
+    initMobileAutoAnim();
+  });
 </script>
