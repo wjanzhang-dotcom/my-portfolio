@@ -1,3 +1,6 @@
+---
+// Gallery.astro
+---
 <section class="relative w-full bg-zinc-950 overflow-hidden group">
 
   <a href="/gallery" class="block relative w-full h-auto cursor-pointer" aria-label="查看摄影集画廊">
@@ -7,10 +10,12 @@
       <img
         src="/hero-bg.jpg"
         alt="摄影底图"
-        class="w-full h-auto min-h-[350px] md:min-h-0 object-cover object-center block transition-transform duration-1000 transform-gpu group-hover:scale-105 opacity-90"
+        loading="lazy"
+        decoding="async"
+        class="w-full h-auto min-h-[350px] md:min-h-0 object-cover object-center block opacity-90 md:transition-transform md:duration-1000 md:transform-gpu md:group-hover:scale-105"
       />
 
-      <div class="absolute top-[15%] md:top-[16%] left-1/2 -translate-x-1/2 z-10 w-full px-4 flex flex-col items-center text-center pointer-events-none transition-transform duration-1000 group-hover:translate-y-[-10px]">
+      <div class="absolute top-[15%] md:top-[16%] left-1/2 -translate-x-1/2 z-10 w-full px-4 flex flex-col items-center text-center pointer-events-none md:transition-transform md:duration-1000 md:group-hover:-translate-y-3">
         
         <p class="text-[clamp(0.8rem,1vw,1.1rem)] text-white/90 font-light tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-4 drop-shadow-lg">
           在这里，你可以看到山野湖海与生活方式的视觉切片
@@ -25,7 +30,9 @@
       <img
         src="/hero-mountain-front.png"
         alt="前景遮挡"
-        class="absolute top-0 left-0 w-full h-auto min-h-[350px] md:min-h-0 object-cover object-center block transition-transform duration-1000 transform-gpu group-hover:scale-105 z-20 pointer-events-none"
+        loading="lazy"
+        decoding="async"
+        class="absolute top-0 left-0 w-full h-auto min-h-[350px] md:min-h-0 object-cover object-center block z-20 pointer-events-none md:transition-all md:duration-1000 md:transform-gpu md:group-hover:scale-110 md:group-hover:-translate-y-1"
       />
 
     </div>

@@ -7,11 +7,11 @@
 
   <div class="relative z-10 w-full max-w-5xl px-6 flex flex-col items-center text-center">
     
-    <span class="text-zinc-400 text-xs md:text-sm tracking-[0.2em] font-medium uppercase mb-6 md:mb-8">
+    <span class="text-zinc-400 text-xs md:text-sm tracking-[0.2em] font-medium uppercase mb-6 md:mb-8 md:animate-enter" style="animation-delay: 0s;">
       Resume & Portfolio
     </span>
 
-    <h1 class="whitespace-nowrap text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white tracking-tight mb-14 md:mb-20 leading-none drop-shadow-md">
+    <h1 class="whitespace-nowrap text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white tracking-tight mb-14 md:mb-20 leading-none drop-shadow-md md:animate-enter" style="animation-delay: 0.1s;">
       你好，我是张伟健
     </h1>
 
@@ -21,29 +21,35 @@
       <p>在这里，你可以看到我的工作履历、我跑过的 10 公里，以及一起一起这里那里的足迹</p>
     </div>
 
-    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full z-20" style="filter: url(#gooey);">
+    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full relative">
       
-      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
-        <div class="magnetic-btn rounded-full">
-          <a href="sports" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
-            <span class="magnetic-text inline-block pointer-events-none">运动记录</span>
-          </a>
+      <div class="md:animate-slide-left relative z-10" style="animation-delay: 0.65s;">
+        <div class="md:transition-transform md:duration-700 md:ease-[cubic-bezier(0.16,1,0.3,1)] md:transform-gpu md:group-hover:-translate-y-2">
+          <div class="magnetic-btn rounded-full cursor-pointer">
+            <a href="sports" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800/90 text-white rounded-full text-sm md:text-base font-medium border border-zinc-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] md:hover:bg-zinc-700 md:hover:border-zinc-600 transition-colors duration-300 md:group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.1)] backdrop-blur-sm">
+              <span class="magnetic-text inline-block pointer-events-none">运动记录</span>
+            </a>
+          </div>
         </div>
       </div>
 
-      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2 z-10">
-        <div class="magnetic-btn rounded-full">
-          <a href="resume" class="block relative px-8 py-3.5 md:px-10 md:py-4 bg-white text-zinc-950 rounded-full text-sm md:text-base font-bold hover:bg-zinc-200 transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
-            <span class="magnetic-text inline-block pointer-events-none">工作履历</span>
-          </a>
+      <div class="md:animate-center-btn relative z-20" style="animation-delay: 0.5s;">
+        <div class="md:transition-transform md:duration-700 md:ease-[cubic-bezier(0.16,1,0.3,1)] md:transform-gpu md:group-hover:-translate-y-2">
+          <div class="magnetic-btn rounded-full cursor-pointer">
+            <a href="resume" class="block relative px-8 py-3.5 md:px-10 md:py-4 bg-zinc-50 text-zinc-950 rounded-full text-sm md:text-base font-bold border border-white shadow-[0_4px_10px_rgba(0,0,0,0.3),inset_0_-3px_5px_rgba(0,0,0,0.05)] md:hover:bg-white transition-colors duration-300 md:group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15),inset_0_-2px_5px_rgba(0,0,0,0.1)]">
+              <span class="magnetic-text inline-block pointer-events-none">工作履历</span>
+            </a>
+          </div>
         </div>
       </div>
 
-      <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
-        <div class="magnetic-btn rounded-full">
-          <a href="footprints" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
-            <span class="magnetic-text inline-block pointer-events-none">个人足迹</span>
-          </a>
+      <div class="md:animate-slide-right relative z-10" style="animation-delay: 0.65s;">
+        <div class="md:transition-transform md:duration-700 md:ease-[cubic-bezier(0.16,1,0.3,1)] md:transform-gpu md:group-hover:-translate-y-2">
+          <div class="magnetic-btn rounded-full cursor-pointer">
+            <a href="footprints" class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800/90 text-white rounded-full text-sm md:text-base font-medium border border-zinc-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] md:hover:bg-zinc-700 md:hover:border-zinc-600 transition-colors duration-300 md:group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.1)] backdrop-blur-sm">
+              <span class="magnetic-text inline-block pointer-events-none">个人足迹</span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -52,40 +58,103 @@
 </section>
 
 <style>
-  .duang-text:hover p {
-    color: #71717a; 
-    transition: color 0.4s ease;
-  }
-
   .duang-text p {
     display: inline-block;
     width: 100%;
-    transition: color 0.3s ease, transform 0.3s ease;
+    opacity: 1; 
+    transform: none;
     cursor: default;
-    
-    will-change: opacity, transform;
-    
-    opacity: 0;
-    animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .duang-text p:hover {
-    color: #ffffff; 
-    transform: translateX(4px); 
-  }
+  @media (min-width: 768px) {
+    .md\:animate-enter {
+      opacity: 0;
+      will-change: opacity, transform;
+      animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
-  .duang-text p:nth-child(1) { animation-delay: 0.1s; }
-  .duang-text p:nth-child(2) { animation-delay: 0.25s; }
-  .duang-text p:nth-child(3) { animation-delay: 0.4s; }
+    .md\:animate-center-btn {
+      opacity: 0;
+      will-change: opacity, transform;
+      animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .md\:animate-slide-left {
+      opacity: 0;
+      will-change: opacity, transform;
+      animation: slide-out-left 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .md\:animate-slide-right {
+      opacity: 0;
+      will-change: opacity, transform;
+      animation: slide-out-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .duang-text p {
+      opacity: 0; 
+      transition: color 0.3s ease, transform 0.3s ease;
+      will-change: opacity, transform;
+      animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .duang-text:hover p {
+      color: #71717a; 
+    }
+
+    .duang-text p:hover {
+      color: #ffffff; 
+      transform: translateX(4px); 
+    }
+
+    .duang-text p:nth-child(1) { animation-delay: 0.2s; }
+    .duang-text p:nth-child(2) { animation-delay: 0.3s; }
+    .duang-text p:nth-child(3) { animation-delay: 0.4s; }
+
+    .magnetic-btn {
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .magnetic-text {
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
 
   @keyframes fade-in-up {
     0% { 
       opacity: 0; 
-      transform: translateY(10px); 
+      transform: translateY(12px); 
     }
     100% { 
       opacity: 1; 
       transform: translateY(0) translateX(0); 
+    }
+  }
+
+  @keyframes slide-out-left {
+    0% {
+      opacity: 0;
+      transform: translateX(160px) scale(0.9);
+    }
+    15% {
+      opacity: 1; 
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes slide-out-right {
+    0% {
+      opacity: 0;
+      transform: translateX(-160px) scale(0.9);
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
     }
   }
 </style>
@@ -101,9 +170,7 @@
       let requestAnimationFrameId = null; 
 
       btn.addEventListener('mousemove', (e) => {
-        if (requestAnimationFrameId) {
-          cancelAnimationFrame(requestAnimationFrameId);
-        }
+        if (requestAnimationFrameId) cancelAnimationFrame(requestAnimationFrameId);
 
         requestAnimationFrameId = requestAnimationFrame(() => {
           const rect = btn.getBoundingClientRect();
@@ -123,15 +190,13 @@
       });
 
       btn.addEventListener('mouseleave', () => {
-        if (requestAnimationFrameId) {
-          cancelAnimationFrame(requestAnimationFrameId);
-        }
+        if (requestAnimationFrameId) cancelAnimationFrame(requestAnimationFrameId);
         
-        btn.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        btn.style.transition = ''; 
         btn.style.transform = 'translate(0px, 0px) scale(1)';
 
         if (textContent) {
-          textContent.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          textContent.style.transition = '';
           textContent.style.transform = 'translate(0px, 0px)';
         }
       });

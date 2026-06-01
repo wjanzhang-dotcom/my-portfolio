@@ -8,6 +8,7 @@
   <div class="relative z-10 w-full flex flex-col items-center px-6 md:px-16">
     
     <div class="text-center w-full max-w-4xl z-20 mb-12 md:mb-20">
+      
       <h2 class="text-[clamp(2.5rem,8vw,4.5rem)] font-bold text-white tracking-tight leading-none mb-4 md:mb-6">
         实验项目
       </h2>
@@ -16,21 +17,25 @@
         在这里，你可以看到一些我个人主导的实验项目
       </p>
 
-      <div class="flex flex-row justify-center gap-4 md:gap-6 z-20" style="filter: url(#gooey);">
+      <div class="flex flex-row justify-center gap-4 md:gap-6 z-20 relative">
         
-        <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
-          <div class="magnetic-btn rounded-full">
-            <button class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
-              <span class="magnetic-text inline-block pointer-events-none">运行沙盒</span>
-            </button>
+        <div class="relative z-10">
+          <div class="md:transition-transform md:duration-700 md:ease-[cubic-bezier(0.16,1,0.3,1)] md:transform-gpu md:group-hover:-translate-y-2">
+            <div class="magnetic-btn rounded-full cursor-pointer">
+              <button class="block px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800/90 text-white rounded-full text-sm md:text-base font-medium border border-zinc-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] md:hover:bg-zinc-700 md:hover:border-zinc-600 transition-colors duration-300 md:group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.1)] backdrop-blur-sm">
+                <span class="magnetic-text inline-block pointer-events-none">运行沙盒</span>
+              </button>
+            </div>
           </div>
         </div>
         
-        <div class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu group-hover:-translate-y-2">
-          <div class="magnetic-btn rounded-full">
-            <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800 text-white rounded-full text-sm md:text-base font-medium hover:bg-zinc-700 transition-all duration-300 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)]">
-              <span class="magnetic-text inline-block pointer-events-none">小红书主页 ↗</span>
-            </a>
+        <div class="relative z-10">
+          <div class="md:transition-transform md:duration-700 md:ease-[cubic-bezier(0.16,1,0.3,1)] md:transform-gpu md:group-hover:-translate-y-2">
+            <div class="magnetic-btn rounded-full cursor-pointer">
+              <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center px-6 py-3 md:px-8 md:py-3.5 bg-zinc-800/90 text-white rounded-full text-sm md:text-base font-medium border border-zinc-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] md:hover:bg-zinc-700 md:hover:border-zinc-600 transition-colors duration-300 md:group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.1)] backdrop-blur-sm">
+                <span class="magnetic-text inline-block pointer-events-none">小红书主页 ↗</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -51,15 +56,64 @@
 
     </div>
   </div>
-
-  <svg width="0" height="0" class="absolute hidden">
-    <defs>
-      <filter id="gooey">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
-        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-      </filter>
-    </defs>
-  </svg>
-  
 </section>
+
+<style>
+  /* 仅保留桌面端磁性按钮的归位回弹过渡，其余冗余 keyframes 已全部清空 */
+  @media (min-width: 768px) {
+    .magnetic-btn {
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .magnetic-text {
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
+</style>
+
+<script>
+  const initMagneticButtons = () => {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const magneticButtons = document.querySelectorAll('.magnetic-btn');
+
+    magneticButtons.forEach((btn) => {
+      const textContent = btn.querySelector('.magnetic-text');
+      let requestAnimationFrameId = null; 
+
+      btn.addEventListener('mousemove', (e) => {
+        if (requestAnimationFrameId) cancelAnimationFrame(requestAnimationFrameId);
+
+        requestAnimationFrameId = requestAnimationFrame(() => {
+          const rect = btn.getBoundingClientRect();
+          const h = rect.width / 2;
+          const v = rect.height / 2;
+          const x = e.clientX - rect.left - h;
+          const y = e.clientY - rect.top - v;
+
+          btn.style.transition = 'none'; 
+          btn.style.transform = `translate(${x * 0.35}px, ${y * 0.35}px) scale(1.04)`;
+
+          if (textContent) {
+            textContent.style.transition = 'none';
+            textContent.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+          }
+        });
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        if (requestAnimationFrameId) cancelAnimationFrame(requestAnimationFrameId);
+        
+        btn.style.transition = ''; 
+        btn.style.transform = 'translate(0px, 0px) scale(1)';
+
+        if (textContent) {
+          textContent.style.transition = '';
+          textContent.style.transform = 'translate(0px, 0px)';
+        }
+      });
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', initMagneticButtons);
+  document.addEventListener('astro:page-load', initMagneticButtons);
+</script>
