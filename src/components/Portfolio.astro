@@ -1,5 +1,9 @@
 ---
 // Gallery.astro
+import { Image } from 'astro:assets';
+// 引入移动到 assets 目录下的图片资源
+import heroBg from '../assets/images/hero-bg.jpg';
+import heroMountainFront from '../assets/images/hero-mountain-front.png';
 ---
 <section class="relative w-full bg-zinc-950 overflow-hidden group">
 
@@ -7,10 +11,13 @@
 
     <div class="relative w-full bg-black flex justify-center items-center overflow-hidden">
       
-      <img
-        src="/hero-bg.jpg"
+      {/* 背景底层图片：开启首屏高优先级加载，物理宽度定制为 2560px 确保高分屏画质 */}
+      <Image
+        src={heroBg}
         alt="摄影底图"
-        loading="lazy"
+        width={2560}
+        loading="eager"
+        fetchpriority="high"
         decoding="async"
         class="w-full h-auto min-h-[350px] md:min-h-0 object-cover object-center block opacity-90 md:transition-transform md:duration-1000 md:transform-gpu md:group-hover:scale-105"
       />
@@ -27,10 +34,13 @@
         
       </div>
 
-      <img
-        src="/hero-mountain-front.png"
+      {/* 前景遮挡图片：保持与背景图一致的加载优先级与 2560px 渲染宽度，消灭视觉闪烁 */}
+      <Image
+        src={heroMountainFront}
         alt="前景遮挡"
-        loading="lazy"
+        width={2560}
+        loading="eager"
+        fetchpriority="high"
         decoding="async"
         class="absolute top-0 left-0 w-full h-auto min-h-[350px] md:min-h-0 object-cover object-center block z-20 pointer-events-none md:transition-all md:duration-1000 md:transform-gpu md:group-hover:scale-110 md:group-hover:-translate-y-1"
       />
