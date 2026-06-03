@@ -27,8 +27,10 @@ try {
     feeds = data.results.map((item) => {
       const titleProp = item.properties['Name'] || item.properties['标题'];
       const summaryProp = item.properties['Summary'] || item.properties['摘要'];
-      const dateProp = item.properties['Date'] || item.properties['日期'];
       const categoryProp = item.properties['Category'] || item.properties['分类'];
+      
+      const isLongPostProp = item.properties['IsLongPost'];
+      const isLongPost = isLongPostProp?.checkbox || false;
       
       const categoryName = categoryProp?.select?.name || '未分类';
       const categoryColor = categoryProp?.select?.color || 'default';
@@ -39,14 +41,21 @@ try {
       categoryInfo[categoryName].count++;
       totalPosts++;
 
+      // 【核心重构：时间处理逻辑】抓取 Notion 原生创建时间与最后修改时间
+      const createdDateStr = new Date(item.created_time).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+      const editedDateStr = new Date(item.last_edited_time).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+
       return {
         id: item.id,
         title: titleProp?.title?.[0]?.plain_text || '无标题',
         summary: summaryProp?.rich_text?.[0]?.plain_text || '摘要生成中...',
-        date: new Date(dateProp?.date?.start || item.created_time).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-'),
+        createdDate: createdDateStr,
+        editedDate: editedDateStr,
+        showEdited: createdDateStr !== editedDateStr, // 如果同一天则为 false，用于模板判断
         isPinned: item.properties['Pinned']?.checkbox || false,
         category: categoryName,
-        categoryColor: categoryColor
+        categoryColor: categoryColor,
+        isLongPost: isLongPost
       };
     });
   }
@@ -79,7 +88,6 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     
     <div id="banner-bg" class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-screen bg-transparent border-b border-transparent transition-all duration-300 ease-out z-0"></div>
     
-    {/* 🔥 核心修正：字号对标主骨架，提升至 text-5xl md:text-6xl（约 48px 到 60px） */}
     <h2 id="section-title" class="relative z-10 text-5xl md:text-6xl font-bold tracking-tight text-gray-900 drop-shadow-sm origin-center" style="backface-visibility: hidden;">
       随笔碎片
     </h2>
@@ -113,22 +121,42 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     <main class="w-full max-w-2xl px-4 md:px-0 flex flex-col gap-5 relative z-10">
       {feeds.map((item) => {
         const tagTheme = flatColors[item.categoryColor] || flatColors.default;
+        
         return (
-          <a href={`/post/${item.id}`} data-article-category={item.category} class="article-card group w-full cursor-pointer block transition-opacity duration-300">
+          <a href={item.isLongPost ? `/post/${item.id}/1` : `/post/${item.id}`} data-article-category={item.category} class="article-card group w-full cursor-pointer block transition-opacity duration-300">
             <div class={unifiedCardStyle}>
-              <h3 transition:name={`title-${item.id}`} class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-snug">{item.title}</h3>
-              <div class="flex items-center flex-wrap gap-2.5 mb-4">
-                <time class="text-[13px] text-gray-400 font-medium tracking-wide shrink-0">{item.date}</time>
-                {item.isPinned && (
-                  <span class="px-3 py-1 text-[11px] font-bold bg-red-50/80 text-red-600 border border-red-200 rounded-full flex items-center gap-1 shrink-0">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path></svg>置顶
-                  </span>
-                )}
-                {item.category && item.category !== '未分类' && (
-                  <span class={`px-3 py-1 rounded-full text-[11px] font-bold border shrink-0 ${tagTheme.capsule}`}>{item.category}</span>
+              
+              {/* 1. 标签区：上移至标题上方 */}
+              {(item.isPinned || (item.category && item.category !== '未分类')) && (
+                <div class="flex items-center flex-wrap gap-2 mb-3">
+                  {item.isPinned && (
+                    <span class="px-3 py-1 text-[11px] font-bold bg-red-50/80 text-red-600 border border-red-200 rounded-full flex items-center gap-1 shrink-0">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path></svg>置顶
+                    </span>
+                  )}
+                  {item.category && item.category !== '未分类' && (
+                    <span class={`px-3 py-1 rounded-full text-[11px] font-bold border shrink-0 ${tagTheme.capsule}`}>{item.category}</span>
+                  )}
+                </div>
+              )}
+
+              {/* 2. 标题区 */}
+              <h3 transition:name={`title-${item.id}`} class="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-snug">{item.title}</h3>
+              
+              {/* 3. 时间区：紧跟标题，按需展示修改时间 */}
+              <div class="flex items-center flex-wrap gap-2 mb-4 text-[13px] text-gray-400 font-medium tracking-wide">
+                <time class="shrink-0">{item.createdDate}</time>
+                {item.showEdited && (
+                  <>
+                    <span class="w-1 h-1 rounded-full bg-gray-300 shrink-0"></span>
+                    <span class="shrink-0">最后修改于：{item.editedDate}</span>
+                  </>
                 )}
               </div>
+
+              {/* 4. 摘要区 */}
               <p class="text-sm md:text-[15px] text-gray-500/90 leading-relaxed line-clamp-5 md:line-clamp-2">{item.summary}</p>
+            
             </div>
           </a>
         )
@@ -197,15 +225,12 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     if (bannerContainer && sectionTitle) {
       sectionTitle.style.willChange = 'transform';
 
-      // 🔥 核心逻辑：保证初始字号够大，且置顶时缩小到正好约 30px (缩放比例调至 0.5)
       const updateTitleScale = () => {
         const rect = bannerContainer.getBoundingClientRect();
         const range = 250; 
         const distance = Math.max(0, Math.min(rect.top, range));
         const ratio = distance / range;
         
-        // 当 ratio=1 (初始)，scale=1.0，显示 text-6xl 原大小
-        // 当 ratio=0 (置顶)，scale=0.5，缩小一半，精确压回现有字号
         const scale = 0.5 + (0.5 * ratio);
 
         sectionTitle.style.transform = `scale(${scale})`;
