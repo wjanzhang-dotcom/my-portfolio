@@ -1,0 +1,90 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// 1. 核心契约：必须导出 getStaticPaths，否则 Astro 无法识别动态路径
+export async function getStaticPaths() {
+  const GALLERY_API_KEY = import.meta.env.NOTION_GALLERY_API_KEY;
+  const GALLERY_DB_ID = import.meta.env.NOTION_GALLERY_DB_ID;
+
+  const response = await fetch(`https://api.notion.com/v1/databases/${GALLERY_DB_ID}/query`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${GALLERY_API_KEY}`,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sorts: [{ property: 'Date', direction: 'descending' }] })
+  });
+
+  const data = await response.json();
+  const photoGroups = {};
+
+  data.results?.forEach((page) => {
+    const rawSlug = page.properties.Slug?.rich_text[0]?.plain_text || 'untitled';
+    const groupKey = rawSlug.replace(/-?\d+$/, '');
+    
+    if (!photoGroups[groupKey]) {
+      photoGroups[groupKey] = [];
+    }
+    photoGroups[groupKey].push({
+      title: page.properties.Title?.title[0]?.plain_text || '未命名',
+      location: page.properties.Location?.rich_text[0]?.plain_text || '',
+      camera: page.properties.Camera?.rich_text[0]?.plain_text || '',
+      remark: page.properties.Remark?.rich_text[0]?.plain_text || '',
+      date: page.properties.Date?.date?.start || '',
+      imageUrl: page.properties.ImageURL?.url || ''
+    });
+  });
+
+  return Object.keys(photoGroups).map((slug) => ({
+    params: { slug },
+    props: { 
+      photos: photoGroups[slug], 
+      collectionTitle: photoGroups[slug][0].title.split('-')[0], 
+      collectionDate: photoGroups[slug][0].date,
+      collectionLocation: photoGroups[slug][0].location
+    }
+  }));
+}
+
+const { photos, collectionTitle, collectionDate, collectionLocation } = Astro.props;
+---
+
+<Layout title={`${collectionTitle}`}>
+  <main class="min-h-screen bg-[#F7F7F5] dark:bg-[#09090b] transition-colors duration-500 py-20">
+    <article class="max-w-4xl mx-auto px-6">
+      <header class="mb-20">
+        <a href="/gallery" class="text-[10px] uppercase tracking-[0.3em] text-stone-400 dark:text-stone-600 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+          ← Back to Archive
+        </a>
+        <h1 class="text-4xl md:text-5xl font-serif text-stone-900 dark:text-stone-100 font-light mt-8 mb-6">
+          {collectionTitle}
+        </h1>
+        <div class="flex items-center gap-6 text-[11px] uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 font-medium">
+          <span>{collectionDate.replace(/-/g, '.')}</span>
+          {collectionLocation && <span>{collectionLocation}</span>}
+        </div>
+      </header>
+
+      <div class="space-y-32">
+        {photos.map((photo) => (
+          <figure class="w-full flex flex-col items-center">
+            <div class="w-full shadow-lg overflow-hidden">
+              <img src={photo.imageUrl} alt={photo.title} class="w-full h-auto block" loading="lazy" />
+            </div>
+            <figcaption class="mt-8 flex flex-col items-center gap-2">
+              {photo.remark && <p class="text-sm font-serif italic text-stone-600 dark:text-stone-400 max-w-lg text-center mb-4">“{photo.remark}”</p>}
+              {photo.camera && <span class="text-[9px] uppercase tracking-[0.3em] text-stone-400 dark:text-stone-600 font-medium">{photo.camera.replace(/ /g, ' · ')}</span>}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <footer class="mt-32 pt-16 border-t border-stone-200 dark:border-stone-800 text-center">
+        <a href="/gallery" class="text-[10px] uppercase tracking-[0.3em] text-stone-500 hover:text-stone-900 dark:hover:text-stone-300 transition-colors">
+          ← Back to Archive
+        </a>
+      </footer>
+    </article>
+  </main>
+</Layout>

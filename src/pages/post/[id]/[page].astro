@@ -291,10 +291,12 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
              </filter>
            </svg>
 
-           <div class="absolute inset-0 w-full h-full drop-shadow-[0_6px_16px_rgba(0,0,0,0.06)]" style="filter: url(#gooey);">
-              <div id="gooey-blob-prev" class="absolute top-0 h-12 w-12 bg-white/95 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]" style={hasPrev ? 'left: 0px; opacity: 1;' : 'left: 40px; opacity: 0;'}></div>
-              <div id="gooey-blob-center" class="absolute top-0 h-12 bg-white/95 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]" style={(!hasPrev ? 'left: 0px; ' : 'left: 60px; ') + (!hasNext ? 'right: 0px;' : 'right: 60px;')}></div>
-              <div id="gooey-blob-next" class="absolute top-0 h-12 w-12 bg-white/95 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]" style={hasNext ? 'right: 0px; opacity: 1;' : 'right: 40px; opacity: 0;'}></div>
+           <div class="absolute inset-0 w-full h-full drop-shadow-[0_0_1px_rgba(0,0,0,0.12)] drop-shadow-[0_6px_16px_rgba(0,0,0,0.06)]">
+              <div class="absolute inset-0 w-full h-full" style="filter: url(#gooey);">
+                 <div id="gooey-blob-prev" class="absolute top-0 h-12 w-12 bg-white/95 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]" style={hasPrev ? 'left: 0px; opacity: 1;' : 'left: 40px; opacity: 0;'}></div>
+                 <div id="gooey-blob-center" class="absolute top-0 h-12 bg-white/95 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]" style={(!hasPrev ? 'left: 0px; ' : 'left: 60px; ') + (!hasNext ? 'right: 0px;' : 'right: 60px;')}></div>
+                 <div id="gooey-blob-next" class="absolute top-0 h-12 w-12 bg-white/95 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]" style={hasNext ? 'right: 0px; opacity: 1;' : 'right: 40px; opacity: 0;'}></div>
+              </div>
            </div>
 
            <div class="relative w-full h-full z-10 px-0">
@@ -335,11 +337,12 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
           <div class="px-2 mb-4">
              <h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">目录导航</h3>
           </div>
-          <nav class="flex flex-col gap-1 border-l-2 border-gray-200/60 ml-[11px] relative">
+          <nav class="flex flex-col gap-1 relative ml-[11px]">
+            <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-gray-200/60 z-0"></div>
             {tocItems.map(item => (
               <a href={`#section-${item.pageIndex}`} 
-                 /* 【修改点】 小球加了 before:z-10 层级拉高，并严丝合缝靠左(before:-left-[5px]) */
-                 class={`toc-link relative text-left py-1.5 text-sm font-medium transition-all duration-300 line-clamp-2 pr-2 pl-4 text-gray-500 hover:text-gray-900 before:absolute before:-left-[5px] before:top-1/2 before:-translate-y-1/2 before:w-[8px] before:h-[8px] before:rounded-full before:z-10 before:transition-all before:duration-300 before:opacity-0 before:scale-50`}>
+                 /* 【修改点 1 配合】：给 a 标签加上 z-10，调整小球居左至 -3px */
+                 class={`toc-link relative z-10 text-left py-1.5 text-sm font-medium transition-all duration-300 line-clamp-2 pr-2 pl-4 text-gray-500 hover:text-gray-900 before:absolute before:-left-[3px] before:top-1/2 before:-translate-y-1/2 before:w-[8px] before:h-[8px] before:rounded-full before:z-10 before:transition-all before:duration-300 before:opacity-0 before:scale-50`}>
                 {item.text}
               </a>
             ))}
@@ -568,30 +571,45 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
           observer.observe(sensor);
         }
 
+        // 【修改点 2】：废除 IntersectionObserver 带来的位置判定错位，改用精准的雷达扫描
         const tocLinks = document.querySelectorAll('.toc-link');
         const sections = document.querySelectorAll('section.mobile-page');
         
         if (tocLinks.length > 0 && sections.length > 0 && window.innerWidth >= 1024) {
-           const spyObserver = new IntersectionObserver((entries) => {
-             entries.forEach(entry => {
-               if (entry.isIntersecting) {
-                 const id = entry.target.id;
-                 tocLinks.forEach(link => {
-                   if (link.getAttribute('href') === `#${id}`) {
-                     // 【修改点】将原来的 static shadow 类替换为 nav-dot-active 触发呼吸动画
-                     link.classList.remove('text-gray-500', 'hover:text-gray-900', 'before:opacity-0', 'before:scale-50');
-                     link.classList.add('text-emerald-500', 'font-bold', 'before:bg-emerald-500', 'before:opacity-100', 'nav-dot-active');
+           const updateActiveSpy = () => {
+             let activeId = sections[0].id; // 默认保底第一项
+             const triggerLine = window.innerHeight * 0.3; // 判定线：屏幕上方往下 30% 处
+             
+             // 如果滚动到底部了，强行高亮最后一项，防止最后一段太短触发不了
+             const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+
+             if (isAtBottom) {
+                 activeId = sections[sections.length - 1].id;
+             } else {
+                 for (const sec of sections) {
+                   const rect = sec.getBoundingClientRect();
+                   // 只要这个板块的顶部碰到了、或者越过了我们的雷达线，就判定为当前阅读位置
+                   if (rect.top <= triggerLine) {
+                     activeId = sec.id;
                    } else {
-                     // 【修改点】离开时，确保移除 nav-dot-active 停止动画
-                     link.classList.remove('text-emerald-500', 'font-bold', 'before:bg-emerald-500', 'before:opacity-100', 'nav-dot-active');
-                     link.classList.add('text-gray-500', 'hover:text-gray-900', 'before:opacity-0', 'before:scale-50');
+                     break; // 因为 DOM 是顺序的，遇到一个没过线的，说明后面的肯定没过，直接退出
                    }
-                 });
+                 }
+             }
+
+             tocLinks.forEach(link => {
+               if (link.getAttribute('href') === `#${activeId}`) {
+                 link.classList.remove('text-gray-500', 'hover:text-gray-900', 'before:opacity-0', 'before:scale-50');
+                 link.classList.add('text-emerald-500', 'font-bold', 'before:bg-emerald-500', 'before:opacity-100', 'nav-dot-active');
+               } else {
+                 link.classList.remove('text-emerald-500', 'font-bold', 'before:bg-emerald-500', 'before:opacity-100', 'nav-dot-active');
+                 link.classList.add('text-gray-500', 'hover:text-gray-900', 'before:opacity-0', 'before:scale-50');
                }
              });
-           }, { rootMargin: '-10% 0px -40% 0px', threshold: 0 }); 
+           };
 
-           sections.forEach(sec => spyObserver.observe(sec));
+           window.addEventListener('scroll', updateActiveSpy, { passive: true });
+           setTimeout(updateActiveSpy, 50); // 进页面时主动校准一次
         }
 
         const menuClose = document.getElementById('mobile-menu-close');
