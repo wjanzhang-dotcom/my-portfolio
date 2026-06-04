@@ -576,11 +576,10 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
 
           isMenuAnimating = true;
           const menuContent = document.getElementById('menu-content');
-          const rect = menuTrigger.getBoundingClientRect();
-          const screenHeight = window.innerHeight;
-          
+          const triggerRect = menuTrigger.getBoundingClientRect();
           const navContainer = document.getElementById('mobile-bottom-nav');
-          const navRect = navContainer ? navContainer.getBoundingClientRect() : rect;
+          const navRect = navContainer ? navContainer.getBoundingClientRect() : triggerRect;
+          const screenHeight = window.innerHeight;
           
           if (openTarget) {
              menuContent.style.transition = 'none';
@@ -591,7 +590,8 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
              void menuContent.offsetHeight; 
              const naturalHeight = menuContent.scrollHeight;
              
-             const isFullScreen = naturalHeight > (screenHeight * 0.55);
+             // 判定阈值上调至 75%
+             const isFullScreen = naturalHeight > (screenHeight * 0.75);
 
              let targetWidth, targetHeight, targetLeft, targetBottom, targetRadius, targetPadding;
 
@@ -606,7 +606,8 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
                  targetWidth = navRect.width;
                  targetHeight = naturalHeight;
                  targetLeft = navRect.left;
-                 targetBottom = screenHeight - navRect.bottom; 
+                 // 修正 Bug 1：精确计算 bottom，让菜单框正好悬浮在导航栏上方 8px 处
+                 targetBottom = (screenHeight - navRect.top) + 8; 
                  targetRadius = 24; 
                  targetPadding = '20px';
              }
@@ -619,10 +620,10 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
 
              bgMorph.style.transition = 'none';
              bgMorph.style.opacity = '1';
-             bgMorph.style.left = rect.left + 'px';
-             bgMorph.style.bottom = (screenHeight - rect.bottom) + 'px';
-             bgMorph.style.width = rect.width + 'px';
-             bgMorph.style.height = rect.height + 'px';
+             bgMorph.style.left = triggerRect.left + 'px';
+             bgMorph.style.bottom = (screenHeight - triggerRect.bottom) + 'px';
+             bgMorph.style.width = triggerRect.width + 'px';
+             bgMorph.style.height = triggerRect.height + 'px';
              bgMorph.style.borderRadius = '9999px';
 
              requestAnimationFrame(() => {
