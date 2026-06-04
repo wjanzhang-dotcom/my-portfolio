@@ -8,7 +8,8 @@ import Layout from '../layouts/Layout.astro';
   <main class="min-h-screen text-stone-900 dark:text-stone-100 pt-20 pb-40 px-6 md:px-12 max-w-5xl mx-auto font-sans transition-colors duration-500">
     
     <header class="mb-24 md:mb-32">
-      <h1 class="text-4xl md:text-5xl tracking-widest md:tracking-[0.2em] break-words text-stone-900 dark:text-stone-100 mb-6 font-light uppercase">Acknowledgement</h1>
+      {/* 混合动力排版：移动端 clamp 无级缩放，768px 以上锁定 5xl。移除 break-words */}
+      <h1 class="text-[clamp(1.3rem,6.5vw,2.25rem)] md:text-5xl tracking-widest md:tracking-[0.2em] text-stone-900 dark:text-stone-100 mb-6 font-light uppercase">Acknowledgement</h1>
       <p class="text-[10px] md:text-xs text-stone-500 dark:text-stone-400 tracking-widest md:tracking-[0.3em] uppercase">— 致敬那些构成这个数字空间的齿轮与火花</p>
     </header>
 
@@ -60,7 +61,6 @@ import Layout from '../layouts/Layout.astro';
           <div class="grid grid-cols-1 md:grid-cols-12 gap-y-2 gap-x-8 py-8 border-b border-stone-200 dark:border-stone-800">
             <div class="md:col-span-4 flex flex-col justify-start">
               <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1.5 w-fit text-stone-900 dark:text-stone-100 hover:text-stone-500 transition-colors">
-                {/* Vercel 极简三角图标 */}
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 22 20 2 20"></polygon></svg>
                 <h3 class="text-sm tracking-widest uppercase font-medium group-hover:underline underline-offset-4">Vercel</h3>
               </a>
@@ -117,8 +117,8 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </section>
 
-      {/* SECTION 3: The Sparks */}
-      <section class="mb-24">
+      {/* SECTION 3: The Sparks - 移除 mb 留白，贴合下方容器 */}
+      <section>
         <h2 class="text-xs tracking-widest md:tracking-[0.4em] uppercase text-stone-400 dark:text-stone-500 mb-8 font-medium">03 / The Sparks</h2>
         <div class="border-t border-stone-900 dark:border-stone-100">
           
@@ -135,19 +135,51 @@ import Layout from '../layouts/Layout.astro';
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-12 gap-y-2 gap-x-8 py-8 border-b border-stone-200 dark:border-stone-800">
-            <div class="md:col-span-4 flex flex-col justify-start">
-              <h3 class="text-sm tracking-widest uppercase font-medium">小哈</h3>
-            </div>
-            <div class="md:col-span-8 mt-2 md:mt-0">
-              <p class="text-xs md:text-sm text-stone-500 dark:text-stone-400 font-light leading-relaxed max-w-2xl">感谢最为纯粹的陪伴。脚边的温度和奔跑的背影，是冰冷代码世界之外最柔软的现实锚点。</p>
-            </div>
+        <div class="md:col-span-4 flex flex-col justify-start">
+          <div class="flex items-center gap-x-3 gap-y-2 group">
+            {/* 内联“小哈”SVG Logo
+              捕捉了参考图片的粗线条、简笔画和粉色伸舌头神韵
+              该图标随文本颜色自动适应深浅模式
+            */}
+            <svg
+              class="w-7 h-7 flex-shrink-0"
+              viewBox="0 0 100 100"
+              fill="none"
+              stroke="currentColor" // 随文本颜色变化
+              stroke-width="3.5" // 粗线条，捕捉原始感
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              {/* 左耳和脸颊 */}
+              <path d="M22,35 c-10-10-10,20,0,10 l0,30 l10,10 l0-20" />
+              {/* 头顶一点波浪 */}
+              <path d="M 32 30 C 40 25 60 25 68 30" />
+              {/* 右耳和脸颊 */}
+              <path d="M68,35 c10-10,10,20,0,10 l0,30 l-10,10 l0-20" />
+              {/* 眼睛 - 比正常更考下且考内 */}
+              <circle cx="44" cy="49" r="2.2" fill="currentColor" stroke="none" />
+              <circle cx="56" cy="49" r="2.2" fill="currentColor" stroke="none" />
+              {/* 鼻子嘴巴和舌头连接 */}
+              <path d="M 50 56 V 62 Q 53 66 57 62 Q 50 68 43 62 Q 47 66 50 62 Z" fill="none" stroke-width="3" />
+              {/* 舌头 - 唯一填充粉色的部分 */}
+              <path d="M 50 62 V 78 Q 55 82 61 78 L 50 62 Z" fill="#EFA9A5" stroke="#EFA9A5" stroke-width="1" />
+              {/* 尾巴 (右侧) */}
+              <path d="M 75 25 L 85 15 L 65 20 Z" />
+            </svg>
+            <h3 class="text-sm tracking-widest uppercase font-medium group-hover:underline underline-offset-4">小哈</h3>
           </div>
+        </div>
+        <div class="md:col-span-8 mt-2 md:mt-0">
+          <p class="text-xs md:text-sm text-stone-500 dark:text-stone-400 font-light leading-relaxed max-w-2xl">感谢最为纯粹的陪伴。脚边的温度和奔跑的背影，是冰冷代码世界之外最柔软的现实锚点。</p>
+        </div>
+      </div>
 
         </div>
       </section>
 
-      {/* 特别鸣谢：绝对极简的中央阵列 */}
-      <section class="pt-24 border-t border-stone-200 dark:border-stone-800 flex flex-col items-center justify-center text-center">
+      {/* 特别鸣谢：闭环的独立区块，自带上下边距和底线 */}
+      <section class="py-16 md:py-24 border-b border-stone-200 dark:border-stone-800 flex flex-col items-center justify-center text-center">
         <p class="text-[10px] text-stone-400 tracking-widest md:tracking-[0.4em] uppercase mb-16 font-medium">Special Mentions</p>
         <div class="flex flex-col space-y-8">
           <span class="text-lg md:text-xl font-light tracking-widest md:tracking-[0.5em] uppercase text-stone-900 dark:text-stone-100">张雪好机车</span>
