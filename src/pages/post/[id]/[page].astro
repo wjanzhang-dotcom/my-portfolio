@@ -576,58 +576,43 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
 
           isMenuAnimating = true;
           const menuContent = document.getElementById('menu-content');
-          const triggerRect = menuTrigger.getBoundingClientRect();
           const navContainer = document.getElementById('mobile-bottom-nav');
-          const navRect = navContainer ? navContainer.getBoundingClientRect() : triggerRect;
+          const navRect = navContainer ? navContainer.getBoundingClientRect() : menuTrigger.getBoundingClientRect();
           const screenHeight = window.innerHeight;
           
           if (openTarget) {
              menuContent.style.transition = 'none';
-             menuContent.style.width = navRect.width + 'px'; 
+             
+             let targetWidth = navRect.width; 
+             menuContent.style.width = targetWidth + 'px'; 
              menuContent.style.height = 'max-content'; 
-             menuContent.style.padding = '20px'; 
+             menuContent.style.padding = '24px'; 
              
              void menuContent.offsetHeight; 
              const naturalHeight = menuContent.scrollHeight;
              
-             // 判定阈值上调至 75%
-             const isFullScreen = naturalHeight > (screenHeight * 0.75);
+             const targetHeight = Math.min(naturalHeight, screenHeight * 0.75);
 
-             let targetWidth, targetHeight, targetLeft, targetBottom, targetRadius, targetPadding;
-
-             if (isFullScreen) {
-                 targetWidth = window.innerWidth;
-                 targetHeight = screenHeight;
-                 targetLeft = 0;
-                 targetBottom = 0;
-                 targetRadius = 0;
-                 targetPadding = '24px 24px 48px 24px';
-             } else {
-                 targetWidth = navRect.width;
-                 targetHeight = naturalHeight;
-                 targetLeft = navRect.left;
-                 // 修正 Bug 1：精确计算 bottom，让菜单框正好悬浮在导航栏上方 8px 处
-                 targetBottom = (screenHeight - navRect.top) + 8; 
-                 targetRadius = 24; 
-                 targetPadding = '20px';
-             }
+             let targetLeft = navRect.left;
+             let targetBottom = screenHeight - navRect.bottom; 
+             let targetRadius = 32; 
 
              menuContent.style.width = targetWidth + 'px';
              menuContent.style.height = targetHeight + 'px';
              menuContent.style.left = targetLeft + 'px';
              menuContent.style.bottom = targetBottom + 'px';
-             menuContent.style.padding = targetPadding;
 
              bgMorph.style.transition = 'none';
              bgMorph.style.opacity = '1';
-             bgMorph.style.left = triggerRect.left + 'px';
-             bgMorph.style.bottom = (screenHeight - triggerRect.bottom) + 'px';
-             bgMorph.style.width = triggerRect.width + 'px';
-             bgMorph.style.height = triggerRect.height + 'px';
+             bgMorph.style.left = navRect.left + 'px';
+             bgMorph.style.bottom = (screenHeight - navRect.bottom) + 'px';
+             bgMorph.style.width = navRect.width + 'px';
+             bgMorph.style.height = navRect.height + 'px';
              bgMorph.style.borderRadius = '9999px';
 
              requestAnimationFrame(() => {
-                bgMorph.style.transition = 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                // 核心修改：0.2s 极速弹出，配合侵略性 ease-out 曲线
+                bgMorph.style.transition = 'all 0.2s cubic-bezier(0.1, 0.9, 0.2, 1)';
                 bgMorph.style.left = targetLeft + 'px';
                 bgMorph.style.bottom = targetBottom + 'px';
                 bgMorph.style.width = targetWidth + 'px';
@@ -635,16 +620,18 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
                 bgMorph.style.borderRadius = targetRadius + 'px';
                 
                 document.body.classList.add('menu-open');
-                setTimeout(() => { isMenuAnimating = false; }, 400);
+                // 动画锁时间同步缩短为 200ms
+                setTimeout(() => { isMenuAnimating = false; }, 200);
              });
           } else {
              document.body.classList.remove('menu-open');
              
-             const currentRect = menuTrigger.getBoundingClientRect();
-             bgMorph.style.left = currentRect.left + 'px';
-             bgMorph.style.bottom = (screenHeight - currentRect.bottom) + 'px';
-             bgMorph.style.width = currentRect.width + 'px';
-             bgMorph.style.height = currentRect.height + 'px';
+             const currentNavRect = navContainer ? navContainer.getBoundingClientRect() : menuTrigger.getBoundingClientRect();
+             
+             bgMorph.style.left = currentNavRect.left + 'px';
+             bgMorph.style.bottom = (screenHeight - currentNavRect.bottom) + 'px';
+             bgMorph.style.width = currentNavRect.width + 'px';
+             bgMorph.style.height = currentNavRect.height + 'px';
              bgMorph.style.borderRadius = '9999px';
 
              bgMorph.style.transform = '';
@@ -660,7 +647,7 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
                     menuContent.style.padding = '';
                 }
                 isMenuAnimating = false;
-             }, 400);
+             }, 200);
           }
         }
 
@@ -710,12 +697,13 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
               if (menuContent) menuContent.style.transform = '';
               toggleMenu(false);
             } else {
+              // 拖拽回弹动画同步提速
               if (bgMorph) {
-                bgMorph.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                bgMorph.style.transition = 'transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1)';
                 bgMorph.style.transform = 'translateY(0)';
               }
               if (menuContent) {
-                menuContent.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                menuContent.style.transition = 'transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1)';
                 menuContent.style.transform = 'translateY(0)';
               }
               setTimeout(() => {
@@ -723,7 +711,7 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
                   if (bgMorph) bgMorph.style.transform = '';
                   if (menuContent) menuContent.style.transform = '';
                 }
-              }, 400);
+              }, 200);
             }
           });
         }
