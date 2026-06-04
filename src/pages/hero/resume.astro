@@ -1,0 +1,113 @@
+---
+// src/pages/resume.astro
+import Layout from '../../layouts/Layout.astro';
+// 引入你刚刚创建的数据文件
+import resumeData from '../../data/resume.json';
+---
+
+<Layout title="张伟健 - 工作履历">
+  
+  {/* 外层包裹层：保留履历页专属的白底、字体颜色和排版变量 */}
+  <div class="bg-white text-zinc-900 font-sans antialiased selection:bg-zinc-200 min-h-screen relative w-full flex flex-col">
+
+    {/* 导出 PDF 按钮：调大了 top 的值，避开全局导航栏的空间 */}
+    <button onclick="window.print()" class="fixed top-20 right-6 md:top-24 md:right-10 inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200 shadow-sm z-40 cursor-pointer print-hide">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      导出 PDF
+    </button>
+
+    <main class="max-w-3xl mx-auto px-6 pt-16 md:pt-24 pb-32 print-main w-full">
+      
+      <header class="mb-16 print-header">
+        <h1 class="text-4xl font-bold tracking-tight mb-4 text-zinc-900">{resumeData.header.title}</h1>
+        <p class="text-zinc-600 leading-relaxed text-sm md:text-base" set:html={resumeData.header.description}></p>
+      </header>
+
+      <div class="flex flex-wrap gap-2 mb-20 print-tags">
+        {resumeData.tags.map((tag) => (
+          <span class="px-3 py-1.5 rounded-md bg-zinc-100 text-zinc-700 text-sm font-medium">{tag}</span>
+        ))}
+      </div>
+
+      <section class="mb-24 print-section">
+        <h2 class="text-xl font-bold text-zinc-900 border-b border-zinc-200 pb-4 mb-8">独立探索与 AI 实践</h2>
+        <div class="space-y-6 print-project-container">
+          {resumeData.projects.map((project) => (
+            <div class="p-6 md:p-8 rounded-xl border border-zinc-200 bg-white hover:shadow-md hover:border-zinc-300 transition-all duration-300 print-card">
+              <h3 class="text-lg font-bold mb-3 text-zinc-900">{project.title}</h3>
+              <p class="text-zinc-600 text-sm leading-relaxed mb-6">{project.description}</p>
+              <div class="flex flex-wrap gap-2">
+                {project.highlights.map((highlight) => (
+                  <span class="px-2.5 py-1 rounded border border-zinc-200 text-xs text-zinc-500 font-medium">{highlight}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="print-section">
+        <h2 class="text-xl font-bold text-zinc-900 border-b border-zinc-200 pb-4 mb-8">职业经历</h2>
+        <div class="space-y-12 md:space-y-16 print-timeline-container">
+          {resumeData.experiences.map((exp) => (
+            <div class="flex flex-col md:flex-row gap-4 md:gap-8 print-row">
+              <div class="md:w-48 shrink-0">
+                <div class="text-sm font-medium text-zinc-500 font-mono tracking-tight">{exp.period}</div>
+                <div class="text-base font-bold text-zinc-900 mt-1">{exp.company}</div>
+                <div class="text-sm text-zinc-500 mt-0.5">{exp.role}</div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-zinc-900 mb-3">{exp.title}</h3>
+                <ul class="space-y-3 text-sm text-zinc-600 leading-relaxed list-none">
+                  {exp.achievements.map((achievement) => {
+                    // 将 "**加粗文本**" 的 markdown 语法转换为 HTML 的 <strong> 标签
+                    const htmlAchievement = achievement.replace(/\*\*(.*?)\*\*/g, '<strong class="text-zinc-800 font-medium">$1</strong>');
+                    return (
+                      <li class="relative pl-4 before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-zinc-300 before:rounded-full" set:html={htmlAchievement}></li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+    </main>
+  </div>
+</Layout>
+
+<style is:global>
+  @media print {
+    html, body { background-color: #ffffff !important; color: #111111 !important; font-size: 10.5pt !important; line-height: 1.6 !important; }
+    .print-hide { display: none !important; }
+    @page { size: A4; margin: 20mm 15mm 20mm 15mm; }
+    .print-main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
+    .print-header { margin-bottom: 8mm !important; }
+    .print-header h1 { font-size: 26pt !important; margin-bottom: 2mm !important; }
+    .print-header p { font-size: 11pt !important; color: #3f3f46 !important; }
+    .print-tags { margin-bottom: 10mm !important; gap: 2mm !important; }
+    .print-tags span { font-size: 9.5pt !important; padding: 1mm 2.5mm !important; background-color: #f4f4f5 !important; border: 1px solid #e4e4e7 !important; border-radius: 4px !important; }
+    .print-section { margin-bottom: 12mm !important; }
+    .print-section h2 { font-size: 14pt !important; padding-bottom: 2mm !important; margin-bottom: 6mm !important; border-bottom: 1px solid #d4d4d8 !important; }
+    .print-project-container { display: block !important; }
+    .print-card { display: block !important; padding: 5mm 6mm !important; margin-bottom: 4mm !important; border: 1px solid #e4e4e7 !important; background-color: #ffffff !important; box-shadow: none !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .print-card:last-child { margin-bottom: 0 !important; }
+    .print-card h3 { font-size: 12pt !important; margin-bottom: 1.5mm !important; }
+    .print-card p { font-size: 10pt !important; color: #3f3f46 !important; margin-bottom: 3mm !important; }
+    .print-card .flex-wrap span { font-size: 8.5pt !important; border: 1px solid #e4e4e7 !important; background: transparent !important; padding: 0.5mm 2mm !important; }
+    .print-timeline-container { display: flex !important; flex-direction: column !important; gap: 8mm !important; }
+    .print-row { display: flex !important; flex-direction: row !important; gap: 8mm !important; align-items: flex-start !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .print-row > .shrink-0 { width: 42mm !important; flex-shrink: 0 !important; }
+    .print-row > .shrink-0 .font-mono { font-size: 10pt !important; color: #52525b !important; }
+    .print-row > .shrink-0 .text-base { font-size: 11pt !important; margin-top: 0.5mm !important; }
+    .print-row > .shrink-0 .text-sm { font-size: 9.5pt !important; color: #71717a !important; }
+    .print-row > .flex-1 h3 { font-size: 12pt !important; margin-bottom: 2mm !important; }
+    .print-row > .flex-1 ul { margin: 0 !important; }
+    .print-row > .flex-1 ul li { font-size: 10pt !important; line-height: 1.55 !important; color: #1c1c1e !important; margin-bottom: 1.5mm !important; padding-left: 3.5mm !important; }
+    .print-row > .flex-1 ul li:last-child { margin-bottom: 0 !important; }
+    .print-row > .flex-1 ul li::before { top: 2mm !important; width: 1.2mm !important; height: 1.2mm !important; background-color: #a1a1aa !important; }
+    h1, h2, h3 { page-break-after: avoid !important; break-after: avoid !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+</style>

@@ -41,7 +41,6 @@ try {
       categoryInfo[categoryName].count++;
       totalPosts++;
 
-      // 【核心重构：时间处理逻辑】抓取 Notion 原生创建时间与最后修改时间
       const createdDateStr = new Date(item.created_time).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
       const editedDateStr = new Date(item.last_edited_time).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
 
@@ -51,7 +50,7 @@ try {
         summary: summaryProp?.rich_text?.[0]?.plain_text || '摘要生成中...',
         createdDate: createdDateStr,
         editedDate: editedDateStr,
-        showEdited: createdDateStr !== editedDateStr, // 如果同一天则为 false，用于模板判断
+        showEdited: createdDateStr !== editedDateStr, 
         isPinned: item.properties['Pinned']?.checkbox || false,
         category: categoryName,
         categoryColor: categoryColor,
@@ -81,25 +80,25 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
 ---
 
 <div class="w-full relative flex flex-col items-center">
-  
-  <div id="banner-sentinel" class="absolute top-0 w-full h-px invisible pointer-events-none"></div>
 
-  <div id="banner-container" class="w-full sticky top-0 z-50 h-[72px] flex items-center justify-center">
-    
-    <div id="banner-bg" class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-screen bg-transparent border-b border-transparent transition-all duration-300 ease-out z-0"></div>
-    
-    <h2 id="section-title" class="relative z-10 text-5xl md:text-6xl font-bold tracking-tight text-gray-900 drop-shadow-sm origin-center" style="backface-visibility: hidden;">
+  {/* 【修改点】：不再使用毛玻璃滤镜，直接改为与页面浑然一体的纯色 (bg-[#f5f5f7]) */}
+  <div id="banner-bg" class="fixed top-[48px] left-0 w-full h-[72px] bg-[#f5f5f7] dark:bg-stone-900 border-transparent transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] z-30 origin-top scale-y-0 opacity-0 pointer-events-none"></div>
+
+  <div id="banner-container" class="w-full sticky top-12 z-40 h-[72px] flex flex-col items-center justify-center">
+    <h2 id="section-title" class="relative z-10 text-5xl md:text-6xl font-bold tracking-tight text-gray-900 drop-shadow-sm origin-center will-change-transform" style="backface-visibility: hidden;">
       随笔碎片
     </h2>
+    <p id="section-subtitle" class="absolute bottom-1.5 md:bottom-0 z-10 opacity-0 translate-y-3 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] text-[10px] md:text-xs tracking-[0.2em] font-sans text-stone-500 dark:text-stone-400 uppercase whitespace-nowrap pointer-events-none">
+      生活，不就是一个接着一个的问题嘛
+    </p>
   </div>
 
   <div class="w-full max-w-5xl mx-auto relative flex flex-col items-center pt-4 md:pt-6">
-    
     <div id="scroll-sentinel" class="absolute top-0 w-full h-px invisible pointer-events-none"></div>
 
     <aside id="tags-nav" class="
-      w-full lg:w-auto px-4 lg:px-0 z-40 mb-6 lg:mb-8
-      sticky top-[72px] pt-2
+      w-full lg:w-auto px-4 lg:px-0 z-30 mb-6 lg:mb-8
+      sticky top-[120px] pt-2
       flex justify-start lg:justify-center overflow-x-auto hide-scrollbar
       transition-all duration-300 ease-out
     ">
@@ -121,12 +120,9 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
     <main class="w-full max-w-2xl px-4 md:px-0 flex flex-col gap-5 relative z-10">
       {feeds.map((item) => {
         const tagTheme = flatColors[item.categoryColor] || flatColors.default;
-        
         return (
           <a href={item.isLongPost ? `/post/${item.id}/1` : `/post/${item.id}`} data-article-category={item.category} class="article-card group w-full cursor-pointer block transition-opacity duration-300">
             <div class={unifiedCardStyle}>
-              
-              {/* 1. 标签区：上移至标题上方 */}
               {(item.isPinned || (item.category && item.category !== '未分类')) && (
                 <div class="flex items-center flex-wrap gap-2 mb-3">
                   {item.isPinned && (
@@ -139,11 +135,7 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
                   )}
                 </div>
               )}
-
-              {/* 2. 标题区 */}
               <h3 transition:name={`title-${item.id}`} class="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-snug">{item.title}</h3>
-              
-              {/* 3. 时间区：紧跟标题，按需展示修改时间 */}
               <div class="flex items-center flex-wrap gap-2 mb-4 text-[13px] text-gray-400 font-medium tracking-wide">
                 <time class="shrink-0">{item.createdDate}</time>
                 {item.showEdited && (
@@ -153,10 +145,7 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
                   </>
                 )}
               </div>
-
-              {/* 4. 摘要区 */}
               <p class="text-sm md:text-[15px] text-gray-500/90 leading-relaxed line-clamp-5 md:line-clamp-2">{item.summary}</p>
-            
             </div>
           </a>
         )
@@ -170,18 +159,10 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   .hidden-article { display: none !important; }
 
-  .is-glass {
-    background-color: rgba(245, 245, 247, 0.6) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
-    border-bottom-color: rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 4px 30px -10px rgba(0, 0, 0, 0.08) !important;
-  }
-
   @media (min-width: 1024px) {
     #tags-nav.is-pinned-desktop {
       position: fixed !important;
-      top: 104px !important; 
+      top: 140px !important; 
       left: calc(50% + 350px) !important; 
       padding: 0 !important;
     }
@@ -220,29 +201,67 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
 
     const bannerContainer = document.getElementById('banner-container');
     const sectionTitle = document.getElementById('section-title');
+    const sectionSubtitle = document.getElementById('section-subtitle');
     const bannerBg = document.getElementById('banner-bg');
     
     if (bannerContainer && sectionTitle) {
-      sectionTitle.style.willChange = 'transform';
+      
+      let isMergedState = false; 
 
-      const updateTitleScale = () => {
+      const updatePhysics = () => {
         const rect = bannerContainer.getBoundingClientRect();
-        const range = 250; 
-        const distance = Math.max(0, Math.min(rect.top, range));
-        const ratio = distance / range;
         
-        const scale = 0.5 + (0.5 * ratio);
+        const currentTop = rect.top - 48; 
+        const scaleRange = 250; 
+        const scaleDistance = Math.max(0, Math.min(currentTop, scaleRange));
+        const scaleRatio = scaleDistance / scaleRange;
+        const baseScale = 0.5 + (0.5 * scaleRatio);
 
-        sectionTitle.style.transform = `scale(${scale})`;
+        sectionTitle.style.transform = `scale(${baseScale})`;
+
+        const pullRange = 120;
+        const pullDistance = Math.max(0, Math.min(currentTop, pullRange));
+        const mergeProgress = 1 - (pullDistance / pullRange); 
+
+        // 达到 95% 以上时，向全局导航发出【变成纯色】的融合信号
+        if (mergeProgress >= 0.95) {
+          if (!isMergedState) {
+            isMergedState = true;
+            if (sectionSubtitle) {
+              sectionSubtitle.classList.remove('opacity-0', 'translate-y-3');
+              sectionSubtitle.classList.add('opacity-100', 'translate-y-0');
+            }
+            if (bannerBg) {
+              bannerBg.classList.add('scale-y-100', 'opacity-100');
+              bannerBg.classList.remove('scale-y-0', 'opacity-0');
+            }
+            // 告诉全局导航：变成纯色！
+            window.dispatchEvent(new CustomEvent('nav-fusion-toggle', { detail: 'solid' }));
+          }
+        } else {
+          if (isMergedState) {
+            isMergedState = false;
+            if (sectionSubtitle) {
+              sectionSubtitle.classList.remove('opacity-100', 'translate-y-0');
+              sectionSubtitle.classList.add('opacity-0', 'translate-y-3');
+            }
+            if (bannerBg) {
+              bannerBg.classList.remove('scale-y-100', 'opacity-100');
+              bannerBg.classList.add('scale-y-0', 'opacity-0');
+            }
+            // 告诉全局导航：恢复毛玻璃！
+            window.dispatchEvent(new CustomEvent('nav-fusion-toggle', { detail: 'glass' }));
+          }
+        }
       };
 
-      updateTitleScale();
+      updatePhysics(); 
 
       let ticking = false;
       const onScroll = () => {
         if (!ticking) {
           window.requestAnimationFrame(() => {
-            updateTitleScale();
+            updatePhysics();
             ticking = false;
           });
           ticking = true;
@@ -252,31 +271,18 @@ const unifiedCardStyle = "p-6 md:p-8 bg-white/40 backdrop-blur-xl border border-
       window.addEventListener('scroll', onScroll, { passive: true });
     }
 
-    const bannerSentinel = document.getElementById('banner-sentinel');
     const scrollSentinel = document.getElementById('scroll-sentinel');
     const tagsNav = document.getElementById('tags-nav');
-
-    if (bannerSentinel && bannerBg) {
-      const bannerObserver = new IntersectionObserver((entries) => {
-        const entry = entries[0];
-        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-          bannerBg.classList.add('is-glass');
-        } else {
-          bannerBg.classList.remove('is-glass');
-        }
-      }, { threshold: 0 });
-      bannerObserver.observe(bannerSentinel);
-    }
 
     if (scrollSentinel && tagsNav) {
       const tagsObserver = new IntersectionObserver((entries) => {
         const entry = entries[0];
-        if (!entry.isIntersecting && entry.boundingClientRect.top <= 72) {
+        if (!entry.isIntersecting && entry.boundingClientRect.top <= 120) {
           tagsNav.classList.add('is-pinned-desktop');
         } else {
           tagsNav.classList.remove('is-pinned-desktop');
         }
-      }, { rootMargin: '-72px 0px 0px 0px', threshold: 0 });
+      }, { rootMargin: '-120px 0px 0px 0px', threshold: 0 });
       tagsObserver.observe(scrollSentinel);
     }
   }

@@ -1,20 +1,14 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import Portfolio from '../components/Portfolio.astro';
 import Projects from '../components/Projects.astro';
 import Feed from '../components/Feed.astro';
-// 核心引入：使用最新版 Astro 的引擎名称 ClientRouter
-import { ClientRouter } from 'astro:transitions';
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>张伟健 - 个人主页</title>
-    <ClientRouter />
-  </head>
-  <body class="bg-white m-0 p-0 antialiased selection:bg-blue-500/30 overflow-x-clip">
+<Layout title="张伟健 - 个人主页">
+  {/* 原本 body 的专属样式提权到这个外层容器上 */}
+  <div class="bg-white m-0 p-0 antialiased selection:bg-blue-500/30 overflow-x-clip min-h-screen relative">
     
     <main class="w-full flex flex-col gap-2 bg-white">
       <Hero />
@@ -29,5 +23,6 @@ import { ClientRouter } from 'astro:transitions';
       </section>
 
     </main>
-  </body>
-</html>
+    
+  </div>
+</Layout>

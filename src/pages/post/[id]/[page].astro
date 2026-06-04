@@ -1,5 +1,5 @@
 ---
-import { ClientRouter } from 'astro:transitions';
+import Layout from '../../../layouts/Layout.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Buffer } from 'node:buffer';
@@ -190,52 +190,46 @@ const prevLink = hasPrev ? `/post/${articleId}/${currentPage - 1}` : '#';
 const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>{articleTitle} - {currentPageTitle} - 张伟健</title>
-    <ClientRouter />
-    
-    <style is:global>
-      ::view-transition-old(root), ::view-transition-new(root) {
-        animation-duration: 0.6s;
-        animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
-      }
-      ::-webkit-scrollbar { width: 0px; background: transparent; }
+<Layout title={`${articleTitle} - ${currentPageTitle} - 张伟健`}>
+  
+  <style is:global>
+    ::view-transition-old(root), ::view-transition-new(root) {
+      animation-duration: 0.6s;
+      animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-      html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; }
 
-      body.menu-open { overflow: hidden; }
-      #mobile-overlay { pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
-      body.menu-open #mobile-overlay { pointer-events: auto; opacity: 1; }
-      #menu-content { pointer-events: none; visibility: hidden; transition: visibility 0s linear 0.4s; }
-      body.menu-open #menu-content { pointer-events: auto; visibility: visible; transition: visibility 0s linear 0s; }
+    body.menu-open { overflow: hidden; }
+    #mobile-overlay { pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
+    body.menu-open #mobile-overlay { pointer-events: auto; opacity: 1; }
+    #menu-content { pointer-events: none; visibility: hidden; transition: visibility 0s linear 0.4s; }
+    body.menu-open #menu-content { pointer-events: auto; visibility: visible; transition: visibility 0s linear 0s; }
 
-      .stagger-item {
-        opacity: 0;
-        transform: translateY(15px);
-        transition: opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1), transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-      }
-      body.menu-open .stagger-item { opacity: 1; transform: translateY(0); }
+    .stagger-item {
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1), transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    body.menu-open .stagger-item { opacity: 1; transform: translateY(0); }
 
-      /* 【新增】呼吸动效 */
-      @keyframes breathing-dot {
-        0%, 100% {
-          transform: translateY(-50%) scale(1);
-          box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
-        }
-        50% {
-          transform: translateY(-50%) scale(1.35);
-          box-shadow: 0 0 14px rgba(16, 185, 129, 0.85);
-        }
+    @keyframes breathing-dot {
+      0%, 100% {
+        transform: translateY(-50%) scale(1);
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
       }
-      .nav-dot-active::before {
-        animation: breathing-dot 3s ease-in-out infinite;
+      50% {
+        transform: translateY(-50%) scale(1.35);
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.85);
       }
-    </style>
-  </head>
-  <body class="bg-[#f5f5f7] text-gray-900 antialiased overflow-x-clip selection:bg-emerald-500/30">
+    }
+    .nav-dot-active::before {
+      animation: breathing-dot 3s ease-in-out infinite;
+    }
+  </style>
+
+  <div class="bg-[#f5f5f7] text-gray-900 antialiased overflow-x-clip selection:bg-emerald-500/30 min-h-screen relative">
     
     <data id="page-nav-state" 
           data-has-prev={hasPrev.toString()} 
@@ -244,18 +238,6 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
           data-next-link={nextLink} 
           data-title={currentPageTitle} 
           hidden></data>
-
-    <header id="morph-banner" data-scrolled="false" class="fixed top-0 left-0 w-full z-50 transition-all duration-700 pointer-events-none px-4 md:px-12 hidden lg:flex justify-between items-center bg-transparent border-transparent pt-4 md:pt-8 data-[scrolled=true]:bg-white/5 data-[scrolled=true]:backdrop-blur-xl data-[scrolled=true]:border-b data-[scrolled=true]:border-white/10 data-[scrolled=true]:py-3 md:data-[scrolled=true]:py-4">
-      <div class="w-12 h-12"></div>
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[50%] h-full flex items-center justify-center pointer-events-none z-0">
-        <div id="banner-title" data-scrolled="false" class="transition-all duration-500 text-sm md:text-xl font-bold tracking-tight text-gray-900 opacity-0 translate-y-4 data-[scrolled=true]:opacity-100 data-[scrolled=true]:translate-y-0">
-          {articleTitle}
-        </div>
-      </div>
-      <a href="/" id="pc-close-btn" class="pointer-events-auto shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-[#f5f5f7]/60 backdrop-blur-xl border border-white/40 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:scale-105 transition-all duration-500 z-10">
-         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </a>
-    </header>
 
     {totalPages > 1 && (
       <>
@@ -330,7 +312,6 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
     )}
 
     <main class="max-w-[80rem] mx-auto flex items-start justify-center lg:justify-start gap-8 lg:gap-12 xl:gap-16 relative pt-8 lg:pt-40 pb-32 px-4 md:px-8 lg:px-12">
-      <div id="scroll-sensor" class="absolute top-12 md:top-20 h-1 w-full pointer-events-none opacity-0"></div>
 
       {showMenu && (
         <aside class="hidden lg:block w-56 shrink-0 sticky top-32 z-10">
@@ -341,7 +322,6 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
             <div class="absolute left-0 top-0 bottom-0 w-[2px] bg-gray-200/60 z-0"></div>
             {tocItems.map(item => (
               <a href={`#section-${item.pageIndex}`} 
-                 /* 【修改点 1 配合】：给 a 标签加上 z-10，调整小球居左至 -3px */
                  class={`toc-link relative z-10 text-left py-1.5 text-sm font-medium transition-all duration-300 line-clamp-2 pr-2 pl-4 text-gray-500 hover:text-gray-900 before:absolute before:-left-[3px] before:top-1/2 before:-translate-y-1/2 before:w-[8px] before:h-[8px] before:rounded-full before:z-10 before:transition-all before:duration-300 before:opacity-0 before:scale-50`}>
                 {item.text}
               </a>
@@ -490,18 +470,6 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
 
     <script>
       document.addEventListener('astro:page-load', () => {
-        
-        const pcCloseBtn = document.getElementById('pc-close-btn');
-        if (pcCloseBtn) {
-           pcCloseBtn.addEventListener('click', (e) => {
-             e.preventDefault();
-             if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
-                 window.history.back();
-             } else {
-                 window.location.href = '/';
-             }
-           });
-        }
 
         const stateEl = document.getElementById('page-nav-state');
         const menuTrigger = document.getElementById('nav-menu-trigger'); 
@@ -558,29 +526,14 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
            }
         }
 
-        const sensor = document.getElementById('scroll-sensor');
-        const banner = document.getElementById('morph-banner');
-        const bannerTitle = document.getElementById('banner-title');
-        if (sensor && banner && window.innerWidth >= 1024) {
-          const observer = new IntersectionObserver((entries) => {
-            const isScrolledPast = !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0;
-            const stateStr = isScrolledPast ? 'true' : 'false';
-            banner.dataset.scrolled = stateStr;
-            if(bannerTitle) bannerTitle.dataset.scrolled = stateStr;
-          }, { threshold: 1.0 });
-          observer.observe(sensor);
-        }
-
-        // 【修改点 2】：废除 IntersectionObserver 带来的位置判定错位，改用精准的雷达扫描
         const tocLinks = document.querySelectorAll('.toc-link');
         const sections = document.querySelectorAll('section.mobile-page');
         
         if (tocLinks.length > 0 && sections.length > 0 && window.innerWidth >= 1024) {
            const updateActiveSpy = () => {
-             let activeId = sections[0].id; // 默认保底第一项
-             const triggerLine = window.innerHeight * 0.3; // 判定线：屏幕上方往下 30% 处
+             let activeId = sections[0].id; 
+             const triggerLine = window.innerHeight * 0.3; 
              
-             // 如果滚动到底部了，强行高亮最后一项，防止最后一段太短触发不了
              const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
 
              if (isAtBottom) {
@@ -588,11 +541,10 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
              } else {
                  for (const sec of sections) {
                    const rect = sec.getBoundingClientRect();
-                   // 只要这个板块的顶部碰到了、或者越过了我们的雷达线，就判定为当前阅读位置
                    if (rect.top <= triggerLine) {
                      activeId = sec.id;
                    } else {
-                     break; // 因为 DOM 是顺序的，遇到一个没过线的，说明后面的肯定没过，直接退出
+                     break; 
                    }
                  }
              }
@@ -609,7 +561,7 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
            };
 
            window.addEventListener('scroll', updateActiveSpy, { passive: true });
-           setTimeout(updateActiveSpy, 50); // 进页面时主动校准一次
+           setTimeout(updateActiveSpy, 50); 
         }
 
         const menuClose = document.getElementById('mobile-menu-close');
@@ -776,5 +728,5 @@ const nextLink = hasNext ? `/post/${articleId}/${currentPage + 1}` : '#';
         }
       });
     </script>
-  </body>
-</html>
+  </div>
+</Layout>
