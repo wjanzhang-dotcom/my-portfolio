@@ -1,21 +1,109 @@
 ---
 // src/pages/footprints.astro
 import Layout from '../../layouts/Layout.astro';
-import footprintData from '../../data/footprints.json';
 
-// 从环境变量读取高德 Key
+// 1. 初始化鉴权配置与环境变量
 const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
+const API_KEY = import.meta.env.NOTION_API_KEY;
+const DB_ID = import.meta.env.NOTION_FOOTPRINTS_DB_ID;
+
+const fetchHeaders = {
+  'Authorization': `Bearer ${API_KEY}`,
+  'Notion-Version': '2022-06-28',
+  'Content-Type': 'application/json'
+};
+
+// 2. 数据模型初始化
+let timeline = [];
+let currentLocation = { city: '未知', district: '', lnglat: [104.195397, 35.86166] }; 
+let visitedDistrictsSet = new Set();
+let visitedDistricts = [];
+
+try {
+  const response = await fetch(`https://api.notion.com/v1/databases/${DB_ID}/query`, {
+    method: 'POST',
+    headers: fetchHeaders,
+    body: JSON.stringify({
+      sorts: [{ property: '日期', direction: 'descending' }]
+    })
+  });
+
+  if (!response.ok) throw new Error(`足迹数据库请求失败，状态码: ${response.status}`);
+
+  const dbData = await response.json();
+
+  timeline = dbData.results.map((page) => {
+    const props = page.properties;
+    
+    // 万能提取器
+    const getText = (prop) => prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || '';
+    const getSelect = (prop) => prop?.select?.name || '';
+    const getDate = (prop) => prop?.date?.start || '';
+
+    const rawDate = getDate(props['日期']);
+    const formattedDate = rawDate ? rawDate.split('T')[0] : '未知日期';
+    
+    const spot = getText(props['打卡点']);                         
+    const city = getSelect(props['城市']) || getText(props['城市']) || '';
+    const district = getSelect(props['区县']) || getText(props['区县']) || '';
+    const note = getText(props['备注']) || '';
+    const status = getSelect(props['状态']) || getText(props['状态']) || '';
+    const type = (status.includes('当前')) ? 'current' : 'history';
+
+    // 【新增点】提取影像记录（兼容 Notion 原生上传和外部链接）
+    const imageFiles = props['影像记录']?.files || [];
+    // 优先读取 file.url (原生上传)，其次读取 external.url (外部链接)
+    const imageUrl = imageFiles.length > 0 ? (imageFiles[0].file?.url || imageFiles[0].external?.url || '') : '';
+
+    const lnglatStr = getText(props['坐标_LngLat']);
+    let lnglat = null;
+    if (lnglatStr && lnglatStr.includes(',')) {
+      lnglat = lnglatStr.split(',').map(n => parseFloat(n.trim()));
+    }
+
+    if (city && district) {
+      const uniqueKey = `${city}-${district}`;
+      if (!visitedDistrictsSet.has(uniqueKey)) {
+        visitedDistrictsSet.add(uniqueKey);
+        visitedDistricts.push({ city, district });
+      }
+    }
+
+    // 结构体中注入 imageUrl
+    const item = { type, date: formattedDate, spot, city, district, note, lnglat, imageUrl };
+
+    if (type === 'current' && item.lnglat) {
+      currentLocation = { city: item.city, district: item.district, lnglat: item.lnglat };
+    }
+
+    return item;
+  });
+
+  if (currentLocation.city === '未知') {
+    const latestValid = timeline.find(t => t.lnglat && t.lnglat.length === 2);
+    if (latestValid) {
+      currentLocation = { city: latestValid.city, district: latestValid.district, lnglat: latestValid.lnglat };
+      latestValid.type = 'current'; 
+    }
+  }
+
+} catch (error) {
+  console.error("足迹数据拉取失败:", error);
+}
+
+const footprintData = {
+  currentLocation,
+  visitedDistricts,
+  timeline
+};
 ---
 
 <Layout title="张伟健 - 个人足迹">
   
-  {/* 注入高德地图 API */}
   <script src={`https://webapi.amap.com/maps?v=2.0&key=${amapKey}&plugin=AMap.DistrictSearch`} async></script>
 
-  {/* 原 body 样式提权到外层容器，保持该页面专属的 Light 风格和高亮颜色 */}
   <div class="bg-white text-zinc-900 font-sans antialiased min-h-screen selection:bg-zinc-200 relative flex flex-col w-full">
 
-    {/* 地图容器 */}
     <section class="relative w-full h-[50vh] md:h-[60vh] bg-zinc-100 border-b border-zinc-200" id="map-container">
       <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-400">
         <svg class="w-8 h-8 mb-3 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -55,10 +143,31 @@ const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
 
             <div class="flex flex-col">
               <span class="text-sm font-mono text-zinc-500 mb-1">{item.date}</span>
-              <h3 class="text-lg font-bold text-zinc-900 mb-2">{item.city} <span class="text-zinc-500 font-normal">{item.district}</span></h3>
-              <p class="text-zinc-600 text-sm leading-relaxed bg-zinc-50 p-4 rounded-lg border border-zinc-100">
-                {item.note}
-              </p>
+              
+              <h3 class="text-lg font-bold text-zinc-900 mb-2">
+                {item.spot || item.city} 
+                <span class="text-zinc-500 font-normal text-base ml-1">
+                  {item.spot ? `· ${item.city} ${item.district}` : item.district}
+                </span>
+              </h3>
+
+              {/* 【新增点】照片条件渲染逻辑 */}
+              {item.imageUrl && (
+                <div class="mt-2 mb-3">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.spot || item.city} 
+                    class="w-full max-h-96 object-cover rounded-xl border border-zinc-200 shadow-sm"
+                    loading="lazy" 
+                  />
+                </div>
+              )}
+              
+              {item.note && (
+                <p class="text-zinc-600 text-sm leading-relaxed bg-zinc-50 p-4 rounded-lg border border-zinc-100">
+                  {item.note}
+                </p>
+              )}
             </div>
           </div>
         ))}
@@ -68,13 +177,9 @@ const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
   </div>
 
   <script define:vars={{ mapData: footprintData }}>
-    // 【修改点】：将 DOMContentLoaded 替换为 astro:page-load，完美支持全局动画路由
     document.addEventListener('astro:page-load', () => {
-      
-      // 安全阻断：确保仅在当前足迹页面执行地图渲染，防止报错污染其他页面
       if (!document.getElementById('map-container')) return;
 
-      // 轮询等待高德 API 加载完毕
       const checkAMap = setInterval(() => {
         if (typeof AMap !== 'undefined') {
           clearInterval(checkAMap);
@@ -96,7 +201,6 @@ const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
           subdistrict: 0
         });
 
-        // 1. 渲染多边形区域：使用 城市+区县 联合搜索
         mapData.visitedDistricts.forEach(place => {
           const keyword = `${place.city}${place.district}`;
           districtSearch.search(keyword, (status, result) => {
@@ -106,9 +210,9 @@ const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
                 for (let i = 0; i < bounds.length; i++) {
                   const polygon = new AMap.Polygon({
                     path: bounds[i],
-                    fillColor: '#10b981', // Tailwind emerald-500
+                    fillColor: '#10b981', 
                     fillOpacity: 0.2,
-                    strokeColor: '#059669', // Tailwind emerald-600
+                    strokeColor: '#059669', 
                     strokeWeight: 1
                   });
                   map.add(polygon);
@@ -118,7 +222,6 @@ const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
           });
         });
 
-        // 2. 渲染当前位置：抛弃默认红图，使用原生的 Tailwind DOM 结构做呼吸灯
         const customMarkerContent = `
           <div class="relative flex items-center justify-center w-6 h-6">
             <div class="absolute w-full h-full bg-emerald-400 rounded-full animate-ping opacity-75"></div>
@@ -126,17 +229,18 @@ const amapKey = import.meta.env.PUBLIC_AMAP_KEY;
           </div>
         `;
 
-        const marker = new AMap.Marker({
-          position: new AMap.LngLat(mapData.currentLocation.lnglat[0], mapData.currentLocation.lnglat[1]),
-          content: customMarkerContent,
-          offset: new AMap.Pixel(-12, -12)
-        });
-        map.add(marker);
-        
-        // 视角平滑移至当前位置
-        setTimeout(() => {
-          map.setZoomAndCenter(9, mapData.currentLocation.lnglat, false, 1200);
-        }, 1000);
+        if (mapData.currentLocation.lnglat && mapData.currentLocation.lnglat.length === 2) {
+          const marker = new AMap.Marker({
+            position: new AMap.LngLat(mapData.currentLocation.lnglat[0], mapData.currentLocation.lnglat[1]),
+            content: customMarkerContent,
+            offset: new AMap.Pixel(-12, -12)
+          });
+          map.add(marker);
+          
+          setTimeout(() => {
+            map.setZoomAndCenter(9, mapData.currentLocation.lnglat, false, 1200);
+          }, 1000);
+        }
       }
     });
   </script>

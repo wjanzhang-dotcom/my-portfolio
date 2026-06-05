@@ -15,8 +15,8 @@ const navLinks = [
 ];
 ---
 
-{/* 【修改点 1】：z-50 提升为 z-[100] */}
-<nav id="global-nav" class="sticky top-0 z-[100] w-full bg-white/70 dark:bg-stone-900/70 backdrop-blur-md border-b border-stone-200/50 dark:border-stone-800/50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]">
+{/* 【修改点 1】：z-50 提升为 z-[100]，并追加 print-hide 确保打印时剔除主导航 */}
+<nav id="global-nav" class="sticky top-0 z-[100] w-full bg-white/70 dark:bg-stone-900/70 backdrop-blur-md border-b border-stone-200/50 dark:border-stone-800/50 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] print-hide">
   <div class="max-w-7xl mx-auto px-6 md:px-12 h-12 flex items-center justify-between text-xs tracking-[0.2em] uppercase font-sans relative">
     
     {/* 根据是否为首页，动态隐藏返回按钮，但保留其占位，确保 flex 布局不崩溃 */}
@@ -47,8 +47,8 @@ const navLinks = [
   </div>
 </nav>
 
-{/* 【修改点 2】：z-40 提升为 z-[90] */}
-<div id="mobile-menu" class="fixed inset-0 bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl z-[90] md:hidden flex flex-col pt-24 px-8 gap-8 text-sm tracking-[0.25em] uppercase transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] opacity-0 pointer-events-none -translate-y-4">
+{/* 【修改点 2】：z-40 提升为 z-[90]，并追加 print-hide 确保打印时剔除移动端菜单层 */}
+<div id="mobile-menu" class="fixed inset-0 bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl z-[90] md:hidden flex flex-col pt-24 px-8 gap-8 text-sm tracking-[0.25em] uppercase transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] opacity-0 pointer-events-none -translate-y-4 print-hide">
   {navLinks.map((link) => {
     const isActive = link.href === '/' ? currentPath === '/' : currentPath.startsWith(link.href);
     return (
