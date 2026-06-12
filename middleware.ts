@@ -1,7 +1,7 @@
 export const config = {
   // 这里写你要拦截的路径，假设你的简历页面是 /resume
   // 如果还有单独的 PDF 文件链接，可以用数组：matcher: ['/resume', '/resume.pdf']
-  matcher: '/resume',
+  matcher: ['/hero/resume'],
 };
 
 export default function middleware(request: Request) {
